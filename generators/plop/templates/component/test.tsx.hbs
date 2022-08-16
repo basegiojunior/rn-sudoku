@@ -1,0 +1,15 @@
+import 'react-native';
+
+import React from 'react';
+import renderer from 'react-test-renderer';
+
+import { {{pascalCase name}} } from './{{pascalCase name}}';
+
+describe('{{pascalCase name}}', () => {
+  test('Should render correctly', () => {
+    const tree = renderer
+      .create(<{{pascalCase name}} title="{{pascalCase name}}" />)
+      .toJSON();
+    expect(tree).toMatchSnapshot();
+  });
+});

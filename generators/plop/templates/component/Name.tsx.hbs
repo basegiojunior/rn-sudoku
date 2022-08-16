@@ -1,0 +1,12 @@
+import React from 'react';
+import { Text, View } from 'react-native';
+import { {{pascalCase name}}Props } from './{{pascalCase name}}.types';
+import styles from './{{pascalCase name}}.style';
+
+export const {{pascalCase name}}: React.FC<{{pascalCase name}}Props> = props => {
+  return (
+    <View style={styles.container}>
+      <Text>{props.title}</Text>
+    </View>
+  );
+};
