@@ -1,24 +1,38 @@
 import React from 'react';
-import { Button, Text, View } from 'react-native';
-import styles from './Home.style';
+import { Pressable, Text, View } from 'react-native';
+import { Cell } from '../../model/cell';
+import styles, {
+  makeBackgroundCellStyle,
+  makeBordersCellContainerStyle,
+  makeBordersCellStyle,
+} from './Home.style';
+
+function fillCells(): Array<Array<Cell>> {
+  const cells: Array<Array<Cell>> = [];
+  for (let row = 0; row < 9; row++) {
+    cells.push([]);
+    for (let col = 0; col < 9; col++) {
+      cells[row].push({
+        col,
+        row,
+        highlighted: false,
+        selected: false,
+        value: 1,
+      });
+    }
+  }
+  return cells;
+}
 
 export const Home: React.FC = () => {
-  const [table, setTable] = React.useState<Array<Array<null | number>>>([
-    [null, null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null, null],
-    [null, null, null, null, null, null, null, null, null],
-  ]);
+  const [table, setTable] = React.useState<Array<Array<Cell>>>(fillCells());
 
-  function selectLine({ line }: { line: number }) {
+  function selectLine({ row }: { row: number }) {
     const tableTemp = [...table];
 
-    tableTemp[line].fill(1);
+    tableTemp[row].forEach(cell => {
+      cell.highlighted = true;
+    });
 
     setTable(tableTemp);
   }
@@ -27,20 +41,27 @@ export const Home: React.FC = () => {
     const tableTemp = [...table];
 
     tableTemp.forEach((line, index) => {
-      tableTemp[index][col] = 1;
+      tableTemp[index][col].highlighted = true;
     });
 
     setTable(tableTemp);
   }
 
-  function selectGroup({ line, col }: { line: number; col: number }) {
+  function selectGroup({ row, col }: { row: number; col: number }) {
     const tableTemp = [...table];
+    const rowStart = row - (row % 3);
+    const rowEnd = rowStart + 3;
+    const colStart = col - (col % 3);
+    const colEnd = colStart + 3;
 
-    for (let i = line * 3; i < line * 3 + 3; i++) {
-      for (let j = col * 3; j < col * 3 + 3; j++) {
-        tableTemp[i][j] = 1;
+    for (let i = rowStart; i < rowEnd; i++) {
+      for (let j = colStart; j < colEnd; j++) {
+        tableTemp[i][j].highlighted = true;
       }
     }
+
+    tableTemp[row][col].highlighted = false;
+    tableTemp[row][col].selected = true;
 
     setTable(tableTemp);
   }
@@ -49,10 +70,25 @@ export const Home: React.FC = () => {
     const tableTemp = [...table];
 
     tableTemp.forEach(line => {
-      line.fill(null);
+      line.forEach(cell => {
+        cell.selected = false;
+        cell.highlighted = false;
+      });
     });
 
     setTable(tableTemp);
+  }
+
+  function onPressCell(rowIndex: number, colIndex: number) {
+    if (table[rowIndex][colIndex].selected) {
+      clear();
+      return;
+    }
+
+    clear();
+    selectCol({ col: colIndex });
+    selectLine({ row: rowIndex });
+    selectGroup({ row: rowIndex, col: colIndex });
   }
 
   return (
@@ -61,16 +97,21 @@ export const Home: React.FC = () => {
         <View key={rowIndex} style={styles.row}>
           {row.map((cell, cellIndex) => (
             <View
-              key={cellIndex}
-              style={[styles.cell, cell != null ? styles.selectable : null]}>
-              <Text>{cell}</Text>
+              style={[...makeBordersCellContainerStyle(rowIndex, cellIndex)]}>
+              <Pressable
+                key={cellIndex}
+                onPress={() => onPressCell(rowIndex, cellIndex)}
+                style={[
+                  styles.cell,
+                  makeBackgroundCellStyle(cell.selected, cell.highlighted),
+                  ...makeBordersCellStyle(rowIndex, cellIndex),
+                ]}>
+                <Text>{cell.value}</Text>
+              </Pressable>
             </View>
           ))}
         </View>
       ))}
-
-      <Button title="Action" onPress={() => selectLine({ line: 6 })} />
-      <Button title="Desaction" onPress={clear} />
     </View>
   );
 };
