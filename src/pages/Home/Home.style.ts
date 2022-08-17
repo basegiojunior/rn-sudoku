@@ -1,4 +1,6 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
+
+const cellSize = Math.floor((Dimensions.get('window').width - 30) / 9);
 
 export const makeBackgroundCellStyle = (
   selected: boolean,
@@ -58,9 +60,13 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
   },
+  cellText: {
+    fontSize: cellSize * 0.7,
+    fontWeight: 'normal',
+  },
   cell: {
-    width: 40,
-    height: 40,
+    width: cellSize,
+    height: cellSize,
     borderTopWidth: 1,
     borderTopColor: '#cccccc',
     borderRightWidth: 1,

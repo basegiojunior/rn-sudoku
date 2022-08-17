@@ -106,7 +106,7 @@ export const Home: React.FC = () => {
                   makeBackgroundCellStyle(cell.selected, cell.highlighted),
                   ...makeBordersCellStyle(rowIndex, cellIndex),
                 ]}>
-                <Text>{cell.value}</Text>
+                <Text style={styles.cellText}>{cell.value}</Text>
               </Pressable>
             </View>
           ))}
