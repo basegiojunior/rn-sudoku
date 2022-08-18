@@ -1,4 +1,4 @@
-import { CellType } from '../../model/cell';
+import { CellType } from 'src/model/cell';
 
 export interface CellProps {
   cell: CellType;
