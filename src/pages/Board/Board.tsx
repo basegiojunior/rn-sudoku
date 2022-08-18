@@ -1,14 +1,11 @@
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
-import { Cell } from '../../model/cell';
-import styles, {
-  makeBackgroundCellStyle,
-  makeBordersCellContainerStyle,
-  makeBordersCellStyle,
-} from './Home.style';
+import { View } from 'react-native';
+import Cell from '../../components/Cell';
+import { CellType } from '../../model/cell';
+import styles from './Board.style';
 
-function fillCells(): Array<Array<Cell>> {
-  const cells: Array<Array<Cell>> = [];
+function fillCells(): Array<Array<CellType>> {
+  const cells: Array<Array<CellType>> = [];
   for (let row = 0; row < 9; row++) {
     cells.push([]);
     for (let col = 0; col < 9; col++) {
@@ -25,7 +22,7 @@ function fillCells(): Array<Array<Cell>> {
 }
 
 export const Home: React.FC = () => {
-  const [table, setTable] = React.useState<Array<Array<Cell>>>(fillCells());
+  const [table, setTable] = React.useState<Array<Array<CellType>>>(fillCells());
 
   function selectLine({ row }: { row: number }) {
     const tableTemp = [...table];
@@ -95,20 +92,14 @@ export const Home: React.FC = () => {
     <View style={styles.container}>
       {table.map((row, rowIndex) => (
         <View key={rowIndex} style={styles.row}>
-          {row.map((cell, cellIndex) => (
-            <View
-              style={[...makeBordersCellContainerStyle(rowIndex, cellIndex)]}>
-              <Pressable
-                key={cellIndex}
-                onPress={() => onPressCell(rowIndex, cellIndex)}
-                style={[
-                  styles.cell,
-                  makeBackgroundCellStyle(cell.selected, cell.highlighted),
-                  ...makeBordersCellStyle(rowIndex, cellIndex),
-                ]}>
-                <Text style={styles.cellText}>{cell.value}</Text>
-              </Pressable>
-            </View>
+          {row.map((cell, colIndex) => (
+            <Cell
+              cell={cell}
+              colIndex={colIndex}
+              rowIndex={rowIndex}
+              onPress={onPressCell}
+              key={rowIndex + colIndex}
+            />
           ))}
         </View>
       ))}

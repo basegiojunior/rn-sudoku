@@ -52,14 +52,6 @@ export const makeBordersCellContainerStyle = (row: number, col: number) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-  },
-  row: {
-    flexDirection: 'row',
-  },
   cellText: {
     fontSize: cellSize * 0.7,
     fontWeight: 'normal',

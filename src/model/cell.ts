@@ -1,4 +1,4 @@
-export type Cell = {
+export type CellType = {
   row: number;
   col: number;
   selected: boolean;

@@ -1,11 +1,11 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 export enum RoutesList {
-  Home = 'Home',
+  Board = 'Board',
 }
 
 export type MainParamList = {
-  [RoutesList.Home]: undefined;
+  [RoutesList.Board]: undefined;
 };
 
 export type MainNavigationProps = NativeStackNavigationProp<MainParamList>;
