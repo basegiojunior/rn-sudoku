@@ -21,7 +21,11 @@ export const Cell: React.FC<CellProps> = props => {
           ...makeBordersCellStyle(props.rowIndex, props.colIndex),
         ]}>
         <Text
-          style={[styles.cellText, props.hasError && styles.hasErrorCellText]}>
+          style={[
+            styles.cellText,
+            props.isEqualToSelected && styles.isEqualToSelectedCellText,
+            props.hasError && styles.hasErrorCellText,
+          ]}>
           {props.cell.value}
         </Text>
       </Pressable>

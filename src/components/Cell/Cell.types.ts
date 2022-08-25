@@ -6,4 +6,5 @@ export interface CellProps {
   rowIndex: number;
   colIndex: number;
   hasError: boolean;
+  isEqualToSelected: boolean;
 }

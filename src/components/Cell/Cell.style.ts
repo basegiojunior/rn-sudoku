@@ -77,6 +77,9 @@ const styles = StyleSheet.create({
   hasErrorCellText: {
     color: '#a70f0f',
   },
+  isEqualToSelectedCellText: {
+    color: '#0f19a7',
+  },
   selectable: {
     backgroundColor: '#bdc6e2',
   },

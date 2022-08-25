@@ -73,15 +73,17 @@ export function showCellsErrorsOnSelect({
 
 export function showCellsEqualToSelected({
   table,
-  selectedCell,
+  value,
 }: {
-  selectedCell: CellType;
+  value?: string;
   table: Array<Array<CellType>>;
 }) {
-  table.forEach(rowCells => {
-    rowCells.forEach(cell => {
-      if (cell.value === selectedCell.value) {
+  table.forEach(row => {
+    row.forEach(cell => {
+      if (cell.value === value) {
         cell.isEqualToSelected = true;
+      } else {
+        cell.isEqualToSelected = false;
       }
     });
   });
@@ -95,6 +97,10 @@ export function selectCell({
   table: Array<Array<CellType>>;
 }) {
   highlightOnSelected({ selectedCell, table });
+  showCellsEqualToSelected({
+    value: selectedCell.value,
+    table,
+  });
   table[selectedCell.row][selectedCell.col].selected = true;
   table[selectedCell.row][selectedCell.col].highlighted = false;
 }
@@ -115,7 +121,7 @@ export function fillCellValue({
     table,
   });
   showCellsEqualToSelected({
-    selectedCell: table[selectedCell.row][selectedCell.col],
+    value: newValue,
     table,
   });
 }
@@ -142,22 +148,6 @@ export function clearCellValue({
   getRowIndexes(selectedCell.row).forEach(showError);
   getColIndexes(selectedCell.col).forEach(showError);
   getNinePerNineIndexes(selectedCell.row, selectedCell.col).forEach(showError);
-
-  // updateRowCells({
-  //   table,
-  //   selectedCell,
-  //   updateCell: showError,
-  // });
-  // updateColCells({
-  //   table,
-  //   selectedCell,
-  //   updateCell: showError,
-  // });
-  // updateNinePerNineCells({
-  //   table,
-  //   selectedCell,
-  //   updateCell: showError,
-  // });
 }
 
 export function remainingValues({

@@ -47,6 +47,7 @@ export const Board: React.FC = () => {
               onPress={onPressCell}
               key={rowIndex + colIndex}
               hasError={cell.hasError}
+              isEqualToSelected={cell.isEqualToSelected}
             />
           ))}
         </View>
