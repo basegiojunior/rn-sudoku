@@ -150,20 +150,34 @@ export function clearCellValue({
   getNinePerNineIndexes(selectedCell.row, selectedCell.col).forEach(showError);
 }
 
-export function remainingValues({
-  group,
+export function getRemainingValues({
+  table,
 }: {
-  group: Array<CellType>;
+  table: Array<Array<CellType>>;
 }): Array<string> {
-  const values = group.map(cell => cell.value || '-1');
+  const correctNumberOfValues: Record<string, number> = {
+    '1': 0,
+    '2': 0,
+    '3': 0,
+    '4': 0,
+    '5': 0,
+    '6': 0,
+    '7': 0,
+    '8': 0,
+    '9': 0,
+  };
 
-  const remaining: Array<string> = [];
-
-  values.forEach(value => {
-    if (!CELL_VALUES.includes(value)) {
-      remaining.push(value);
-    }
+  table.forEach(row => {
+    row.forEach(cell => {
+      if (cell.value && !cell.hasError) {
+        correctNumberOfValues[cell.value]++;
+      }
+    });
   });
 
-  return remaining;
+  const remaningValues = Object.keys(correctNumberOfValues).filter(
+    item => correctNumberOfValues[item] !== 9,
+  );
+
+  return remaningValues;
 }

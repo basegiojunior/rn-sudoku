@@ -10,6 +10,7 @@ import {
   selectCell,
   fillCellValue,
   clearCellValue,
+  getRemainingValues,
 } from 'src/utils/manipulateBoard';
 import styles from './Board.style';
 
@@ -78,7 +79,9 @@ export const Board: React.FC = () => {
                 setSelectedCell({ ...selectedCell, value: undefined });
               }
             }}
-            value={cellValue.toString()}
+            value={
+              getRemainingValues({ table }).includes(cellValue) ? cellValue : ''
+            }
           />
         ))}
       </View>
