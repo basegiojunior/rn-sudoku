@@ -5,4 +5,5 @@ export interface CellProps {
   onPress: (rowIndex: number, colIndex: number) => void;
   rowIndex: number;
   colIndex: number;
+  hasError: boolean;
 }

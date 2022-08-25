@@ -74,6 +74,9 @@ const styles = StyleSheet.create({
   highlighted: {
     backgroundColor: '#e0e4ee',
   },
+  hasErrorCellText: {
+    color: '#a70f0f',
+  },
   selectable: {
     backgroundColor: '#bdc6e2',
   },

@@ -20,7 +20,10 @@ export const Cell: React.FC<CellProps> = props => {
           makeBackgroundCellStyle(props.cell.selected, props.cell.highlighted),
           ...makeBordersCellStyle(props.rowIndex, props.colIndex),
         ]}>
-        <Text style={styles.cellText}>{props.cell.value}</Text>
+        <Text
+          style={[styles.cellText, props.hasError && styles.hasErrorCellText]}>
+          {props.cell.value}
+        </Text>
       </Pressable>
     </View>
   );

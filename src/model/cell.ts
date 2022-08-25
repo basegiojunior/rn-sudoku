@@ -3,5 +3,7 @@ export type CellType = {
   col: number;
   selected: boolean;
   highlighted: boolean;
-  value?: number;
+  hasError: boolean;
+  isEqualToSelected: boolean;
+  value?: string;
 };
