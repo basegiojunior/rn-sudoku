@@ -5,5 +5,10 @@ export type CellType = {
   highlighted: boolean;
   hasError: boolean;
   isEqualToSelected: boolean;
-  value?: string;
+  value: number;
+};
+
+export type IndexesType = {
+  row: number;
+  col: number;
 };

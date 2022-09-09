@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Button, View } from 'react-native';
 import ActionButton from 'src/components/ActionButton';
 import Cell from 'src/components/Cell';
 import { CellType } from 'src/model/cell';
@@ -11,7 +11,9 @@ import {
   fillCellValue,
   clearCellValue,
   getRemainingValues,
+  getRemainingValuesByIndex,
 } from 'src/utils/manipulateBoard';
+import { startBoard } from 'src/utils/startBoard';
 import styles from './Board.style';
 
 export const Board: React.FC = () => {
@@ -19,6 +21,7 @@ export const Board: React.FC = () => {
     createEmptyBoard(),
   );
   const [selectedCell, setSelectedCell] = useState<undefined | CellType>();
+  // const [startBoardGen, setStartBoardGen] = useState<any>();
 
   function onPressCell(rowIndex: number, colIndex: number) {
     const newTable = [...table];
@@ -36,19 +39,56 @@ export const Board: React.FC = () => {
     setTable(newTable);
   }
 
+  function newBoard() {
+    let globalCount = 0;
+    const counts = [];
+
+    while (globalCount < 100) {
+      console.log(globalCount);
+      let newTable = [...table];
+
+      let error = true;
+      let count = 0;
+
+      while (error) {
+        count++;
+        newTable = createEmptyBoard();
+        const filled = startBoard({ table: newTable });
+
+        if (filled >= 81) {
+          error = false;
+        }
+      }
+
+      counts.push(count);
+
+      globalCount++;
+    }
+
+    const sum = counts.reduce((prev, current) => prev + current);
+    console.log('média', sum / counts.length);
+
+    // setTable(newTable);
+  }
+
   return (
     <View style={styles.container}>
       {table.map((row, rowIndex) => (
-        <View key={rowIndex} style={styles.row}>
+        <View key={`${rowIndex}row`} style={styles.row}>
           {row.map((cell, colIndex) => (
             <Cell
               cell={cell}
               colIndex={colIndex}
               rowIndex={rowIndex}
               onPress={onPressCell}
-              key={rowIndex + colIndex}
+              key={`${rowIndex}+${colIndex}`}
               hasError={cell.hasError}
               isEqualToSelected={cell.isEqualToSelected}
+              valuesTest={getRemainingValuesByIndex({
+                table,
+                row: rowIndex,
+                col: colIndex,
+              })}
             />
           ))}
         </View>
@@ -76,15 +116,15 @@ export const Board: React.FC = () => {
               } else if (selectedCell && selectedCell.value) {
                 clearCellValue({ selectedCell, table: newTable });
                 setTable(newTable);
-                setSelectedCell({ ...selectedCell, value: undefined });
+                setSelectedCell({ ...selectedCell, value: 0 });
               }
             }}
-            value={
-              getRemainingValues({ table }).includes(cellValue) ? cellValue : ''
-            }
+            value={cellValue}
+            disabled={!getRemainingValues({ table }).includes(cellValue)}
           />
         ))}
       </View>
+      <Button title="new board" onPress={newBoard} />
     </View>
   );
 };

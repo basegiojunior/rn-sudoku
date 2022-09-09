@@ -54,7 +54,18 @@ export const makeBordersCellContainerStyle = (row: number, col: number) => {
 const styles = StyleSheet.create({
   cellText: {
     fontSize: cellSize * 0.7,
+    color: '#2e2e2e',
     fontWeight: 'normal',
+  },
+  textTest: {
+    fontSize: cellSize * 0.3,
+    lineHeight: cellSize * 0.3,
+  },
+  textTestShow: {
+    color: '#3d3d3d',
+  },
+  textTestHide: {
+    color: 'transparent',
   },
   cell: {
     width: cellSize,
@@ -110,6 +121,9 @@ const styles = StyleSheet.create({
   },
   withoutLeftDivider: {
     borderLeftWidth: 0,
+  },
+  row: {
+    flexDirection: 'row',
   },
 });
 

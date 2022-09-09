@@ -9,10 +9,10 @@ const styles = StyleSheet.create({
   valueOptionText: {
     fontSize: 35,
     fontWeight: 'bold',
-    color: '#29475f',
+    color: '#384653',
   },
   valueOptionTextDisabled: {
-    color: '#4f5d68',
+    color: '#b2bec9',
   },
 });
 

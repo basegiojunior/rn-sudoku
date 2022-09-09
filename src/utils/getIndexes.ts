@@ -1,7 +1,4 @@
-export type IndexesType = {
-  row: number;
-  col: number;
-};
+import { IndexesType } from 'src/model/cell';
 
 export function getRowIndexes(rowOrigin: number): Array<IndexesType> {
   const indexes: Array<IndexesType> = [];
@@ -47,4 +44,25 @@ export function getNinePerNineIndexes(
   }
 
   return indexes;
+}
+
+export function getHighlightedIndexes(
+  rowOrigin: number,
+  colOrigin: number,
+): Array<IndexesType> {
+  const rowIndexes = getRowIndexes(rowOrigin);
+  const colIndexes = getColIndexes(colOrigin);
+  const ninePerNineIndexes = getNinePerNineIndexes(rowOrigin, colOrigin);
+
+  const highlightedIndexesWithDuplicated = [
+    ...rowIndexes,
+    ...colIndexes,
+    ...ninePerNineIndexes,
+  ];
+
+  const highlightedIndexesUnique = [
+    ...new Set(highlightedIndexesWithDuplicated),
+  ];
+
+  return highlightedIndexesWithDuplicated;
 }

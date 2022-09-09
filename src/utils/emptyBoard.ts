@@ -10,7 +10,7 @@ export function createEmptyBoard(): Array<Array<CellType>> {
         row,
         highlighted: false,
         selected: false,
-        value: undefined,
+        value: 0,
         hasError: false,
         isEqualToSelected: false,
       });

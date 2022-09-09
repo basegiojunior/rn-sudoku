@@ -1,5 +1,5 @@
 export interface ActionButtonProps {
-  value: string;
+  value: number;
   onPress: () => void;
   variant: ActionButtonVariant;
   disabled?: boolean;

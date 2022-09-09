@@ -1,12 +1,12 @@
-import { CellType } from 'src/model/cell';
+import { CellType, IndexesType } from 'src/model/cell';
 import {
   getColIndexes,
+  getHighlightedIndexes,
   getNinePerNineIndexes,
   getRowIndexes,
-  IndexesType,
 } from './getIndexes';
 
-export const CELL_VALUES = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+export const CELL_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export function clearSelectedCell({
   table,
@@ -75,7 +75,7 @@ export function showCellsEqualToSelected({
   table,
   value,
 }: {
-  value?: string;
+  value: number;
   table: Array<Array<CellType>>;
 }) {
   table.forEach(row => {
@@ -112,7 +112,7 @@ export function fillCellValue({
 }: {
   selectedCell: CellType;
   table: Array<Array<CellType>>;
-  newValue: string;
+  newValue: number;
 }) {
   table[selectedCell.row][selectedCell.col].value = newValue;
   showCellsErrorsOnSelect({
@@ -133,7 +133,7 @@ export function clearCellValue({
   selectedCell: CellType;
   table: Array<Array<CellType>>;
 }) {
-  table[selectedCell.row][selectedCell.col].value = undefined;
+  table[selectedCell.row][selectedCell.col].value = 0;
 
   table.forEach((_, rowIndex) => {
     table[rowIndex].forEach((__, colIndex) => {
@@ -154,30 +154,44 @@ export function getRemainingValues({
   table,
 }: {
   table: Array<Array<CellType>>;
-}): Array<string> {
-  const correctNumberOfValues: Record<string, number> = {
-    '1': 0,
-    '2': 0,
-    '3': 0,
-    '4': 0,
-    '5': 0,
-    '6': 0,
-    '7': 0,
-    '8': 0,
-    '9': 0,
-  };
+}): Array<number> {
+  const correctNumberOfValues: Array<number> = Array.from(
+    { length: 9 },
+    () => 0,
+  );
 
   table.forEach(row => {
     row.forEach(cell => {
       if (cell.value && !cell.hasError) {
-        correctNumberOfValues[cell.value]++;
+        correctNumberOfValues[cell.value - 1]++;
       }
     });
   });
 
-  const remaningValues = Object.keys(correctNumberOfValues).filter(
-    item => correctNumberOfValues[item] !== 9,
+  return correctNumberOfValues;
+}
+
+export function getRemainingValuesByIndex({
+  table,
+  row,
+  col,
+}: {
+  table: Array<Array<CellType>>;
+  row: number;
+  col: number;
+}): Array<number> {
+  const highlightedIndexes = getHighlightedIndexes(row, col);
+
+  const highlightedCells = highlightedIndexes.map(
+    index => table[index.row][index.col],
   );
 
-  return remaningValues;
+  const uniqueHighlightedValues = [
+    ...new Set(highlightedCells.map(cell => cell.value)),
+  ];
+  const remainingValues = CELL_VALUES.filter(
+    value => !uniqueHighlightedValues.includes(value),
+  );
+
+  return remainingValues;
 }
