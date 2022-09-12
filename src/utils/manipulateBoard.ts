@@ -171,6 +171,26 @@ export function getRemainingValues({
   return correctNumberOfValues;
 }
 
+export function removeRemainingValueByIndex({
+  table,
+  row,
+  col,
+  value,
+}: {
+  table: Array<Array<CellType>>;
+  row: number;
+  col: number;
+  value: number;
+}) {
+  const highlightedIndexes = getHighlightedIndexes(row, col);
+
+  highlightedIndexes.forEach(item => {
+    table[item.row][item.col].remaining = table[item.row][
+      item.col
+    ].remaining.filter(valueRem => valueRem !== value);
+  });
+}
+
 export function getRemainingValuesByIndex({
   table,
   row,

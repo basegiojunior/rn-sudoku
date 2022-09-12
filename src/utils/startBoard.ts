@@ -1,10 +1,35 @@
-import { CellType, IndexesType } from 'src/model/cell';
-import { getRemainingValuesByIndex } from './manipulateBoard';
+import { CellType, IndexesType, Table } from 'src/model/cell';
+import {
+  getRemainingValuesByIndex,
+  removeRemainingValueByIndex,
+} from './manipulateBoard';
+
+function overrideValue({
+  table,
+  row,
+  col,
+  value,
+}: {
+  table: Table;
+  row: number;
+  col: number;
+  value: number;
+}) {
+  table[row][col].value = value;
+  removeRemainingValueByIndex({
+    table,
+    row,
+    col,
+    value,
+  });
+}
 
 export function fillRowsUniqueValues({
   table,
+  onEachCell,
 }: {
-  table: Array<Array<CellType>>;
+  table: Table;
+  onEachCell: (cell: CellType, remaining: number[]) => void;
 }): number {
   let numberOfFilled = 0;
 
@@ -16,8 +41,9 @@ export function fillRowsUniqueValues({
 
     table[row].forEach((cell, col) => {
       if (!cell.value) {
-        const remaining = getRemainingValuesByIndex({ table, row, col });
+        const remaining = table[row][col].remaining;
 
+        onEachCell(cell, remaining);
         remaining.forEach(rem => {
           numberOfRemainingValues[rem - 1].col = col;
           numberOfRemainingValues[rem - 1].times++;
@@ -27,7 +53,13 @@ export function fillRowsUniqueValues({
 
     numberOfRemainingValues.forEach((remNumber, remNumberIndex) => {
       if (remNumber.times === 1 && !table[row][remNumber.col].value) {
-        table[row][remNumber.col].value = remNumberIndex + 1;
+        overrideValue({
+          table,
+          row,
+          col: remNumber.col,
+          value: remNumberIndex + 1,
+        });
+
         numberOfFilled++;
       }
     });
@@ -38,8 +70,10 @@ export function fillRowsUniqueValues({
 
 export function fillColumsUniqueValues({
   table,
+  onEachCell,
 }: {
   table: Array<Array<CellType>>;
+  onEachCell: (cell: CellType, remaining: number[]) => void;
 }): number {
   let numberOfFilled = 0;
 
@@ -51,7 +85,10 @@ export function fillColumsUniqueValues({
 
     for (let row = 0; row < 9; row++) {
       if (!table[row][col].value) {
-        const remaining = getRemainingValuesByIndex({ table, row, col });
+        const remaining = table[row][col].remaining;
+
+        onEachCell(table[row][col], remaining);
+
         remaining.forEach(rem => {
           numberOfRemainingValues[rem - 1].row = row;
           numberOfRemainingValues[rem - 1].times++;
@@ -61,7 +98,12 @@ export function fillColumsUniqueValues({
 
     numberOfRemainingValues.forEach((remNumber, remNumberIndex) => {
       if (remNumber.times === 1 && !table[remNumber.row][col].value) {
-        table[remNumber.row][col].value = remNumberIndex + 1;
+        overrideValue({
+          table,
+          row: remNumber.row,
+          col,
+          value: remNumberIndex + 1,
+        });
         numberOfFilled++;
       }
     });
@@ -72,8 +114,10 @@ export function fillColumsUniqueValues({
 
 export function fillNinePerNineUniqueValues({
   table,
+  onEachCell,
 }: {
   table: Array<Array<CellType>>;
+  onEachCell: (cell: CellType, remaining: number[]) => void;
 }): number {
   let numberOfFilled = 0;
   const ninePerNineIndexes = [
@@ -103,7 +147,8 @@ export function fillNinePerNineUniqueValues({
     for (let row = rowStart; row < rowEnd; row++) {
       for (let col = colStart; col < colEnd; col++) {
         if (!table[row][col].value) {
-          const remaining = getRemainingValuesByIndex({ table, row, col });
+          const remaining = table[row][col].remaining;
+          onEachCell(table[row][col], remaining);
           remaining.forEach(rem => {
             numberOfRemainingValues[rem - 1].col = col;
             numberOfRemainingValues[rem - 1].row = row;
@@ -115,7 +160,12 @@ export function fillNinePerNineUniqueValues({
 
     numberOfRemainingValues.forEach((remNumber, remNumberIndex) => {
       if (remNumber.times === 1 && !table[remNumber.row][remNumber.col].value) {
-        table[remNumber.row][remNumber.col].value = remNumberIndex + 1;
+        overrideValue({
+          table,
+          row: remNumber.row,
+          col: remNumber.row,
+          value: remNumberIndex + 1,
+        });
         numberOfFilled++;
       }
     });
@@ -133,16 +183,11 @@ export function startBoard({
 }): number {
   const indexesToFill: Array<IndexesType> = [];
 
-  while (indexesToFill.length < numberOfValuesToFill) {
-    const rowRandom = Math.floor(Math.random() * 9);
-    const colRandom = Math.floor(Math.random() * 9);
-
-    const newIndexToFill = { row: rowRandom, col: colRandom };
-
-    if (!indexesToFill.includes(newIndexToFill)) {
-      indexesToFill.push(newIndexToFill);
-    }
-  }
+  table.forEach(row => {
+    row.forEach(cell => {
+      indexesToFill.push({ row: cell.row, col: cell.col });
+    });
+  });
 
   let numberOfFilled = 0;
   let error = false;
@@ -153,38 +198,38 @@ export function startBoard({
     while (hasNewNumberFilled) {
       hasNewNumberFilled = false;
 
+      const onEachCell = (cell: CellType, remainingValues: number[]) => {
+        if (remainingValues.length === 0 && !cell.value) {
+          numberOfFilled = 81;
+          error = true;
+        } else if (remainingValues.length === 1 && cell.value === 0) {
+          table[cell.row][cell.col].value = remainingValues[0];
+
+          removeRemainingValueByIndex({
+            table,
+            row: cell.row,
+            col: cell.col,
+            value: remainingValues[0],
+          });
+
+          hasNewNumberFilled = true;
+
+          numberOfFilled++;
+        }
+      };
+
       if (numberOfFilled < numberOfValuesToFill) {
-        const rowsFilled = fillRowsUniqueValues({ table });
-        const columnsFilled = fillColumsUniqueValues({ table });
-        const squareFilled = fillNinePerNineUniqueValues({ table });
+        const rowsFilled = fillRowsUniqueValues({
+          table,
+          onEachCell,
+        });
+        const columnsFilled = fillColumsUniqueValues({ table, onEachCell });
+        const squareFilled = fillNinePerNineUniqueValues({ table, onEachCell });
         numberOfFilled += rowsFilled + columnsFilled + squareFilled;
 
         if (rowsFilled + columnsFilled + squareFilled > 0) {
           hasNewNumberFilled = true;
         }
-
-        table.forEach((row, rowIndex) => {
-          row.forEach((cell, colIndex) => {
-            if (numberOfFilled >= numberOfValuesToFill) {
-              return;
-            }
-            const remainingValues = getRemainingValuesByIndex({
-              row: cell.row,
-              col: cell.col,
-              table,
-            });
-
-            if (remainingValues.length === 0 && !cell.value) {
-              numberOfFilled = 81;
-              error = true;
-            } else if (remainingValues.length === 1 && cell.value === 0) {
-              table[rowIndex][colIndex].value = remainingValues[0];
-              hasNewNumberFilled = true;
-
-              numberOfFilled++;
-            }
-          });
-        });
       }
     }
 
@@ -192,11 +237,7 @@ export function startBoard({
       table[indexes.row][indexes.col].value === 0 &&
       numberOfFilled < numberOfValuesToFill
     ) {
-      const remainingValues = getRemainingValuesByIndex({
-        table,
-        row: indexes.row,
-        col: indexes.col,
-      });
+      const remainingValues = table[indexes.row][indexes.col].remaining;
 
       if (remainingValues.length > 0) {
         const randomIndexFromRemainingValues = Math.floor(
@@ -204,6 +245,14 @@ export function startBoard({
         );
         const randomValue = remainingValues[randomIndexFromRemainingValues];
         table[indexes.row][indexes.col].value = randomValue;
+
+        removeRemainingValueByIndex({
+          table,
+          row: indexes.row,
+          col: indexes.col,
+          value: randomValue,
+        });
+
         numberOfFilled += 1;
       }
     }

@@ -40,10 +40,30 @@ export const Board: React.FC = () => {
   }
 
   function newBoard() {
+    let newTable = createEmptyBoard();
+
+    let success = false;
+
+    while (!success) {
+      const filled = startBoard({ table: newTable });
+
+      if (filled === 81) {
+        success = true;
+      } else {
+        newTable = createEmptyBoard();
+      }
+    }
+
+    setTable(newTable);
+  }
+
+  function newBoardTime() {
     let globalCount = 0;
     const counts = [];
 
-    while (globalCount < 100) {
+    const init = new Date();
+
+    while (globalCount < 1000) {
       console.log(globalCount);
       let newTable = [...table];
 
@@ -65,8 +85,12 @@ export const Board: React.FC = () => {
       globalCount++;
     }
 
+    const end = new Date();
+    const timeDif = Math.abs((end.getTime() - init.getTime()) / 1000 / 1000);
+
     const sum = counts.reduce((prev, current) => prev + current);
     console.log('média', sum / counts.length);
+    console.log('time', timeDif, 's');
 
     // setTable(newTable);
   }

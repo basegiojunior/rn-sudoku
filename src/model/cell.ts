@@ -6,9 +6,12 @@ export type CellType = {
   hasError: boolean;
   isEqualToSelected: boolean;
   value: number;
+  remaining: number[];
 };
 
 export type IndexesType = {
   row: number;
   col: number;
 };
+
+export type Table = Array<Array<CellType>>;
