@@ -1,4 +1,4 @@
-import { CellType, IndexesType } from 'src/model/cell';
+import { CellType, IndexesType, Table } from 'src/model/cell';
 import {
   getColIndexes,
   getHighlightedIndexes,
@@ -17,6 +17,7 @@ export function clearSelectedCell({
     line.forEach(cell => {
       cell.selected = false;
       cell.highlighted = false;
+      cell.isEqualToSelected = false;
     });
   });
 }
@@ -32,55 +33,54 @@ export function highlightOnSelected({
     table[row][col].highlighted = true;
   };
 
-  getRowIndexes(selectedCell.row).forEach(updateCell);
-  getColIndexes(selectedCell.col).forEach(updateCell);
-  getNinePerNineIndexes(selectedCell.row, selectedCell.col).forEach(updateCell);
+  getHighlightedIndexes(selectedCell.row, selectedCell.col).forEach(updateCell);
 }
 
-export function showCellsErrorsOnSelect({
+export function verifyErrors({
   table,
-  row,
-  col,
+  valuesToVerify = CELL_VALUES,
 }: {
-  row: number;
-  col: number;
-  table: Array<Array<CellType>>;
+  table: Table;
+  valuesToVerify?: Array<number>;
 }) {
-  let hasError = false;
-  const selectedCell = table[row][col];
+  table.forEach(row => {
+    row.forEach(cell => {
+      if (valuesToVerify.includes(cell.value)) {
+        let hasError = false;
 
-  const verifyErrorCells = (indexes: IndexesType) => {
-    if (
-      selectedCell.value &&
-      table[indexes.row][indexes.col].value === selectedCell.value &&
-      (col !== indexes.col || row !== indexes.row)
-    ) {
-      hasError = true;
-      table[indexes.row][indexes.col].hasError = true;
-    }
-  };
+        const verifyErrorCell = (indexes: IndexesType) => {
+          if (
+            table[indexes.row][indexes.col].value === cell.value &&
+            (cell.col !== indexes.col || cell.row !== indexes.row)
+          ) {
+            hasError = true;
+            table[indexes.row][indexes.col].hasError = true;
+          }
+        };
 
-  getRowIndexes(selectedCell.row).forEach(verifyErrorCells);
-  getColIndexes(selectedCell.col).forEach(verifyErrorCells);
-  getNinePerNineIndexes(selectedCell.row, selectedCell.col).forEach(
-    verifyErrorCells,
-  );
+        const highlightedIndexes = getHighlightedIndexes(cell.row, cell.col);
+        highlightedIndexes.forEach(verifyErrorCell);
 
-  if (hasError) {
-    table[selectedCell.row][selectedCell.col].hasError = true;
-  }
+        if (hasError) {
+          table[cell.row][cell.col].hasError = true;
+        } else {
+          table[cell.row][cell.col].hasError = false;
+        }
+      }
+    });
+  });
 }
 
-export function showCellsEqualToSelected({
+export function verifyCellsEqualToSelected({
   table,
   value,
 }: {
-  value: number;
+  value?: number;
   table: Array<Array<CellType>>;
 }) {
   table.forEach(row => {
     row.forEach(cell => {
-      if (cell.value === value) {
+      if (value && cell.value === value) {
         cell.isEqualToSelected = true;
       } else {
         cell.isEqualToSelected = false;
@@ -97,7 +97,7 @@ export function selectCell({
   table: Array<Array<CellType>>;
 }) {
   highlightOnSelected({ selectedCell, table });
-  showCellsEqualToSelected({
+  verifyCellsEqualToSelected({
     value: selectedCell.value,
     table,
   });
@@ -114,13 +114,17 @@ export function fillCellValue({
   table: Array<Array<CellType>>;
   newValue: number;
 }) {
+  const oldValue = selectedCell.value;
   table[selectedCell.row][selectedCell.col].value = newValue;
-  showCellsErrorsOnSelect({
-    row: selectedCell.row,
-    col: selectedCell.col,
-    table,
-  });
-  showCellsEqualToSelected({
+
+  const valuesToVerify = [newValue];
+  if (oldValue) {
+    valuesToVerify.push(oldValue);
+  }
+
+  verifyErrors({ table, valuesToVerify });
+
+  verifyCellsEqualToSelected({
     value: newValue,
     table,
   });
@@ -133,24 +137,15 @@ export function clearCellValue({
   selectedCell: CellType;
   table: Array<Array<CellType>>;
 }) {
+  const oldValue = selectedCell.value;
   table[selectedCell.row][selectedCell.col].value = 0;
 
-  table.forEach((_, rowIndex) => {
-    table[rowIndex].forEach((__, colIndex) => {
-      table[rowIndex][colIndex].hasError = false;
-    });
-  });
+  verifyErrors({ table, valuesToVerify: [oldValue] });
 
-  const showError = ({ row, col }: IndexesType) => {
-    showCellsErrorsOnSelect({ table, row, col });
-  };
-
-  getRowIndexes(selectedCell.row).forEach(showError);
-  getColIndexes(selectedCell.col).forEach(showError);
-  getNinePerNineIndexes(selectedCell.row, selectedCell.col).forEach(showError);
+  verifyCellsEqualToSelected({ table });
 }
 
-export function getRemainingValues({
+export function getRemainingValuesFromTable({
   table,
 }: {
   table: Array<Array<CellType>>;
@@ -160,15 +155,25 @@ export function getRemainingValues({
     () => 0,
   );
 
+  const completeValues: Array<number> = [];
+
   table.forEach(row => {
     row.forEach(cell => {
       if (cell.value && !cell.hasError) {
         correctNumberOfValues[cell.value - 1]++;
+
+        if (correctNumberOfValues[cell.value - 1] === 9) {
+          completeValues.push(cell.value);
+        }
       }
     });
   });
 
-  return correctNumberOfValues;
+  const remainingValues = CELL_VALUES.filter(
+    value => !completeValues.includes(value),
+  );
+
+  return remainingValues;
 }
 
 export function removeRemainingValueByIndex({
@@ -214,4 +219,24 @@ export function getRemainingValuesByIndex({
   );
 
   return remainingValues;
+}
+
+export function overrideValue({
+  table,
+  row,
+  col,
+  value,
+}: {
+  table: Table;
+  row: number;
+  col: number;
+  value: number;
+}) {
+  table[row][col].value = value;
+  removeRemainingValueByIndex({
+    table,
+    row,
+    col,
+    value,
+  });
 }

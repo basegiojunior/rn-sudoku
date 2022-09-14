@@ -5,13 +5,12 @@ import Cell from 'src/components/Cell';
 import { CellType } from 'src/model/cell';
 import { createEmptyBoard } from 'src/utils/emptyBoard';
 import {
-  clearSelectedCell,
   CELL_VALUES,
   selectCell,
   fillCellValue,
   clearCellValue,
-  getRemainingValues,
-  getRemainingValuesByIndex,
+  getRemainingValuesFromTable,
+  clearSelectedCell,
 } from 'src/utils/manipulateBoard';
 import { startBoard } from 'src/utils/startBoard';
 import styles from './Board.style';
@@ -35,64 +34,13 @@ export const Board: React.FC = () => {
 
     clearSelectedCell({ table: newTable });
     selectCell({ table: newTable, selectedCell: newTable[rowIndex][colIndex] });
-
     setTable(newTable);
   }
 
   function newBoard() {
-    let newTable = createEmptyBoard();
-
-    let success = false;
-
-    while (!success) {
-      const filled = startBoard({ table: newTable });
-
-      if (filled === 81) {
-        success = true;
-      } else {
-        newTable = createEmptyBoard();
-      }
-    }
+    const newTable = startBoard({ level: 'hard' });
 
     setTable(newTable);
-  }
-
-  function newBoardTime() {
-    let globalCount = 0;
-    const counts = [];
-
-    const init = new Date();
-
-    while (globalCount < 1000) {
-      console.log(globalCount);
-      let newTable = [...table];
-
-      let error = true;
-      let count = 0;
-
-      while (error) {
-        count++;
-        newTable = createEmptyBoard();
-        const filled = startBoard({ table: newTable });
-
-        if (filled >= 81) {
-          error = false;
-        }
-      }
-
-      counts.push(count);
-
-      globalCount++;
-    }
-
-    const end = new Date();
-    const timeDif = Math.abs((end.getTime() - init.getTime()) / 1000 / 1000);
-
-    const sum = counts.reduce((prev, current) => prev + current);
-    console.log('média', sum / counts.length);
-    console.log('time', timeDif, 's');
-
-    // setTable(newTable);
   }
 
   return (
@@ -108,11 +56,7 @@ export const Board: React.FC = () => {
               key={`${rowIndex}+${colIndex}`}
               hasError={cell.hasError}
               isEqualToSelected={cell.isEqualToSelected}
-              valuesTest={getRemainingValuesByIndex({
-                table,
-                row: rowIndex,
-                col: colIndex,
-              })}
+              valuesTest={cell.remaining}
             />
           ))}
         </View>
@@ -144,7 +88,9 @@ export const Board: React.FC = () => {
               }
             }}
             value={cellValue}
-            disabled={!getRemainingValues({ table }).includes(cellValue)}
+            disabled={
+              !getRemainingValuesFromTable({ table }).includes(cellValue)
+            }
           />
         ))}
       </View>
