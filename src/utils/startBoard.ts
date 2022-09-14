@@ -1,11 +1,7 @@
 import { CellType, IndexesType, Table } from 'src/model/cell';
 import { createEmptyBoard } from './emptyBoard';
-import {
-  CELL_VALUES,
-  getRemainingValuesByIndex,
-  overrideValue,
-  removeRemainingValueByIndex,
-} from './manipulateBoard';
+import { getHighlightedIndexes } from './getIndexes';
+import { CELL_VALUES } from './manipulateBoard';
 
 type EasyLevels = 'easy' | 'medium' | 'hard';
 
@@ -14,6 +10,28 @@ const DIFFICULTY_INITIAL_FILLED: Record<EasyLevels, number> = {
   medium: 44,
   hard: 38,
 };
+
+export function overrideValue({
+  table,
+  row,
+  col,
+  value,
+}: {
+  table: Table;
+  row: number;
+  col: number;
+  value: number;
+}) {
+  table[row][col].value = value;
+
+  const highlightedIndexes = getHighlightedIndexes(row, col);
+
+  highlightedIndexes.forEach(item => {
+    table[item.row][item.col].remaining = table[item.row][
+      item.col
+    ].remaining.filter(valueRem => valueRem !== value);
+  });
+}
 
 export function fillRowsUniqueValues({
   table,
@@ -185,16 +203,6 @@ export function startBoard({ level = 'easy' }: { level?: EasyLevels }): Table {
 
   indexesToRemove.forEach(indexes => {
     newTable[indexes.row][indexes.col].value = 0;
-  });
-
-  newTable.forEach(row => {
-    row.forEach(cell => {
-      newTable[cell.row][cell.col].remaining = getRemainingValuesByIndex({
-        table: newTable,
-        row: cell.row,
-        col: cell.col,
-      });
-    });
   });
 
   return newTable;

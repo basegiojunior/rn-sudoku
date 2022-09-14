@@ -1,10 +1,5 @@
 import { CellType, IndexesType, Table } from 'src/model/cell';
-import {
-  getColIndexes,
-  getHighlightedIndexes,
-  getNinePerNineIndexes,
-  getRowIndexes,
-} from './getIndexes';
+import { getHighlightedIndexes } from './getIndexes';
 
 export const CELL_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -20,20 +15,6 @@ export function clearSelectedCell({
       cell.isEqualToSelected = false;
     });
   });
-}
-
-export function highlightOnSelected({
-  table,
-  selectedCell,
-}: {
-  selectedCell: CellType;
-  table: Array<Array<CellType>>;
-}) {
-  const updateCell = ({ row, col }: IndexesType) => {
-    table[row][col].highlighted = true;
-  };
-
-  getHighlightedIndexes(selectedCell.row, selectedCell.col).forEach(updateCell);
 }
 
 export function verifyErrors({
@@ -75,7 +56,7 @@ export function verifyCellsEqualToSelected({
   table,
   value,
 }: {
-  value?: number;
+  value: number;
   table: Array<Array<CellType>>;
 }) {
   table.forEach(row => {
@@ -96,7 +77,14 @@ export function selectCell({
   selectedCell: CellType;
   table: Array<Array<CellType>>;
 }) {
-  highlightOnSelected({ selectedCell, table });
+  const highlightCell = ({ row, col }: IndexesType) => {
+    table[row][col].highlighted = true;
+  };
+
+  getHighlightedIndexes(selectedCell.row, selectedCell.col).forEach(
+    highlightCell,
+  );
+
   verifyCellsEqualToSelected({
     value: selectedCell.value,
     table,
@@ -117,10 +105,7 @@ export function fillCellValue({
   const oldValue = selectedCell.value;
   table[selectedCell.row][selectedCell.col].value = newValue;
 
-  const valuesToVerify = [newValue];
-  if (oldValue) {
-    valuesToVerify.push(oldValue);
-  }
+  const valuesToVerify = [oldValue, newValue].filter(value => value !== 0);
 
   verifyErrors({ table, valuesToVerify });
 
@@ -128,21 +113,6 @@ export function fillCellValue({
     value: newValue,
     table,
   });
-}
-
-export function clearCellValue({
-  table,
-  selectedCell,
-}: {
-  selectedCell: CellType;
-  table: Array<Array<CellType>>;
-}) {
-  const oldValue = selectedCell.value;
-  table[selectedCell.row][selectedCell.col].value = 0;
-
-  verifyErrors({ table, valuesToVerify: [oldValue] });
-
-  verifyCellsEqualToSelected({ table });
 }
 
 export function getRemainingValuesFromTable({
@@ -174,69 +144,4 @@ export function getRemainingValuesFromTable({
   );
 
   return remainingValues;
-}
-
-export function removeRemainingValueByIndex({
-  table,
-  row,
-  col,
-  value,
-}: {
-  table: Array<Array<CellType>>;
-  row: number;
-  col: number;
-  value: number;
-}) {
-  const highlightedIndexes = getHighlightedIndexes(row, col);
-
-  highlightedIndexes.forEach(item => {
-    table[item.row][item.col].remaining = table[item.row][
-      item.col
-    ].remaining.filter(valueRem => valueRem !== value);
-  });
-}
-
-export function getRemainingValuesByIndex({
-  table,
-  row,
-  col,
-}: {
-  table: Array<Array<CellType>>;
-  row: number;
-  col: number;
-}): Array<number> {
-  const highlightedIndexes = getHighlightedIndexes(row, col);
-
-  const highlightedCells = highlightedIndexes.map(
-    index => table[index.row][index.col],
-  );
-
-  const uniqueHighlightedValues = [
-    ...new Set(highlightedCells.map(cell => cell.value)),
-  ];
-  const remainingValues = CELL_VALUES.filter(
-    value => !uniqueHighlightedValues.includes(value),
-  );
-
-  return remainingValues;
-}
-
-export function overrideValue({
-  table,
-  row,
-  col,
-  value,
-}: {
-  table: Table;
-  row: number;
-  col: number;
-  value: number;
-}) {
-  table[row][col].value = value;
-  removeRemainingValueByIndex({
-    table,
-    row,
-    col,
-    value,
-  });
 }

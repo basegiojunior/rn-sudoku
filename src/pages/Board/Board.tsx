@@ -8,7 +8,6 @@ import {
   CELL_VALUES,
   selectCell,
   fillCellValue,
-  clearCellValue,
   getRemainingValuesFromTable,
   clearSelectedCell,
 } from 'src/utils/manipulateBoard';
@@ -43,6 +42,21 @@ export const Board: React.FC = () => {
     setTable(newTable);
   }
 
+  function onPressActionCell(cellValue: number) {
+    if (selectedCell) {
+      const newTable = [...table];
+      const newValue = selectedCell?.value === cellValue ? 0 : cellValue;
+
+      fillCellValue({
+        table: newTable,
+        selectedCell,
+        newValue,
+      });
+      setTable(newTable);
+      setSelectedCell({ ...selectedCell, value: newValue });
+    }
+  }
+
   return (
     <View style={styles.container}>
       {table.map((row, rowIndex) => (
@@ -67,26 +81,7 @@ export const Board: React.FC = () => {
           <ActionButton
             key={cellValue}
             variant="valueOption"
-            onPress={() => {
-              const newTable = [...table];
-
-              if (
-                selectedCell &&
-                (!selectedCell?.value || selectedCell?.value !== cellValue)
-              ) {
-                fillCellValue({
-                  table: newTable,
-                  selectedCell: selectedCell,
-                  newValue: cellValue,
-                });
-                setTable(newTable);
-                setSelectedCell({ ...selectedCell, value: cellValue });
-              } else if (selectedCell && selectedCell.value) {
-                clearCellValue({ selectedCell, table: newTable });
-                setTable(newTable);
-                setSelectedCell({ ...selectedCell, value: 0 });
-              }
-            }}
+            onPress={() => onPressActionCell(cellValue)}
             value={cellValue}
             disabled={
               !getRemainingValuesFromTable({ table }).includes(cellValue)
