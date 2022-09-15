@@ -1,61 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Button, View } from 'react-native';
 import ActionButton from 'src/components/ActionButton';
 import Cell from 'src/components/Cell';
-import { CellType } from 'src/model/cell';
-import { createEmptyBoard } from 'src/utils/emptyBoard';
-import {
-  CELL_VALUES,
-  selectCell,
-  fillCellValue,
-  getRemainingValuesFromTable,
-  clearSelectedCell,
-} from 'src/utils/manipulateBoard';
-import { startBoard } from 'src/utils/startBoard';
+import useSudokuBoard, { CELL_VALUES } from 'src/utils/manipulateBoard';
 import styles from './Board.style';
 
 export const Board: React.FC = () => {
-  const [table, setTable] = useState<Array<Array<CellType>>>(
-    createEmptyBoard(),
-  );
-  const [selectedCell, setSelectedCell] = useState<undefined | CellType>();
-  // const [startBoardGen, setStartBoardGen] = useState<any>();
-
-  function onPressCell(rowIndex: number, colIndex: number) {
-    const newTable = [...table];
-    if (newTable[rowIndex][colIndex].selected) {
-      clearSelectedCell({ table: newTable });
-      setSelectedCell(undefined);
-      return;
-    }
-
-    setSelectedCell(newTable[rowIndex][colIndex]);
-
-    clearSelectedCell({ table: newTable });
-    selectCell({ table: newTable, selectedCell: newTable[rowIndex][colIndex] });
-    setTable(newTable);
-  }
-
-  function newBoard() {
-    const newTable = startBoard({ level: 'hard' });
-
-    setTable(newTable);
-  }
-
-  function onPressActionCell(cellValue: number) {
-    if (selectedCell) {
-      const newTable = [...table];
-      const newValue = selectedCell?.value === cellValue ? 0 : cellValue;
-
-      fillCellValue({
-        table: newTable,
-        selectedCell,
-        newValue,
-      });
-      setTable(newTable);
-      setSelectedCell({ ...selectedCell, value: newValue });
-    }
-  }
+  const {
+    table,
+    newBoard,
+    onPressActionCell,
+    onPressCell,
+    getRemainingValuesFromTable,
+  } = useSudokuBoard();
 
   return (
     <View style={styles.container}>
@@ -83,9 +40,7 @@ export const Board: React.FC = () => {
             variant="valueOption"
             onPress={() => onPressActionCell(cellValue)}
             value={cellValue}
-            disabled={
-              !getRemainingValuesFromTable({ table }).includes(cellValue)
-            }
+            disabled={!getRemainingValuesFromTable().includes(cellValue)}
           />
         ))}
       </View>
