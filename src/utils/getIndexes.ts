@@ -1,4 +1,5 @@
 import { IndexesType } from 'src/model/cell';
+import { CELL_VALUES } from './manipulateBoard';
 
 export function getRowIndexes(rowOrigin: number): Array<IndexesType> {
   const indexes: Array<IndexesType> = [];
@@ -64,5 +65,31 @@ export function getHighlightedIndexes(
     ...new Set(highlightedIndexesWithDuplicated),
   ];
 
-  return highlightedIndexesWithDuplicated;
+  return highlightedIndexesUnique;
+}
+
+export function getAllRowsIndexes() {
+  const rowsIndexes = CELL_VALUES.map(value => getRowIndexes(value - 1));
+
+  return rowsIndexes;
+}
+
+export function getAllColsIndexes() {
+  const colsIndexes = CELL_VALUES.map(value => getColIndexes(value - 1));
+
+  return colsIndexes;
+}
+
+export function getAllBlocksIndexes() {
+  const blocksIndexes: IndexesType[][] = [];
+  const blocksBaseArray = [0, 3, 6];
+
+  blocksBaseArray.forEach(row => {
+    blocksBaseArray.forEach(col => {
+      const block = getNinePerNineIndexes(row, col);
+      blocksIndexes.push(block);
+    });
+  });
+
+  return blocksIndexes;
 }

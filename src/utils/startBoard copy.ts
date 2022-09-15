@@ -1,11 +1,6 @@
 import { CellType, IndexesType, Table } from 'src/model/cell';
 import { createEmptyBoard } from './emptyBoard';
-import {
-  getAllBlocksIndexes,
-  getAllColsIndexes,
-  getAllRowsIndexes,
-  getHighlightedIndexes,
-} from './getIndexes';
+import { getHighlightedIndexes } from './getIndexes';
 
 type EasyLevels = 'easy' | 'medium' | 'hard';
 
@@ -37,51 +32,7 @@ export function overrideValue({
   });
 }
 
-function fillUniqueValues(
-  indexesArray: IndexesType[][],
-  table: Table,
-  onEachCell: (cell: CellType, remaining: number[]) => void,
-) {
-  let numberOfFilled = 0;
-
-  indexesArray.forEach((indexes, index) => {
-    const numberOfRemainingValues = Array.from({ length: 9 }, () => ({
-      col: -1,
-      times: 0,
-    }));
-
-    indexes.forEach(cellIndexes => {
-      const cell = table[cellIndexes.row][cellIndexes.col];
-
-      if (!cell.value) {
-        const remaining = table[cellIndexes.row][cellIndexes.col].remaining;
-
-        onEachCell(cell, remaining);
-        remaining.forEach(rem => {
-          numberOfRemainingValues[rem - 1].col = cellIndexes.col;
-          numberOfRemainingValues[rem - 1].times++;
-        });
-      }
-    });
-
-    numberOfRemainingValues.forEach((remNumber, remNumberIndex) => {
-      if (remNumber.times === 1 && !table[index][remNumber.col].value) {
-        overrideValue({
-          table,
-          row: index,
-          col: remNumber.col,
-          value: remNumberIndex + 1,
-        });
-
-        numberOfFilled++;
-      }
-    });
-  });
-
-  return numberOfFilled;
-}
-
-export function fillRowsColsBlocks({
+export function fillRowsUniqueValues({
   table,
   onEachCell,
 }: {
@@ -90,13 +41,143 @@ export function fillRowsColsBlocks({
 }): number {
   let numberOfFilled = 0;
 
-  const blocksIndexes = getAllBlocksIndexes();
-  const rowsIndexes = getAllRowsIndexes();
-  const colsIndexes = getAllColsIndexes();
+  for (let row = 0; row < 9; row++) {
+    const numberOfRemainingValues = Array.from({ length: 9 }, () => ({
+      col: -1,
+      times: 0,
+    }));
 
-  numberOfFilled += fillUniqueValues(rowsIndexes, table, onEachCell);
-  numberOfFilled += fillUniqueValues(colsIndexes, table, onEachCell);
-  numberOfFilled += fillUniqueValues(blocksIndexes, table, onEachCell);
+    table[row].forEach((cell, col) => {
+      if (!cell.value) {
+        const remaining = table[row][col].remaining;
+
+        onEachCell(cell, remaining);
+        remaining.forEach(rem => {
+          numberOfRemainingValues[rem - 1].col = col;
+          numberOfRemainingValues[rem - 1].times++;
+        });
+      }
+    });
+
+    numberOfRemainingValues.forEach((remNumber, remNumberIndex) => {
+      if (remNumber.times === 1 && !table[row][remNumber.col].value) {
+        overrideValue({
+          table,
+          row,
+          col: remNumber.col,
+          value: remNumberIndex + 1,
+        });
+
+        numberOfFilled++;
+      }
+    });
+  }
+
+  return numberOfFilled;
+}
+
+export function fillColumsUniqueValues({
+  table,
+  onEachCell,
+}: {
+  table: Array<Array<CellType>>;
+  onEachCell: (cell: CellType, remaining: number[]) => void;
+}): number {
+  let numberOfFilled = 0;
+
+  for (let col = 0; col < 9; col++) {
+    const numberOfRemainingValues = Array.from({ length: 9 }, () => ({
+      row: -1,
+      times: 0,
+    }));
+
+    for (let row = 0; row < 9; row++) {
+      if (!table[row][col].value) {
+        const remaining = table[row][col].remaining;
+
+        onEachCell(table[row][col], remaining);
+
+        remaining.forEach(rem => {
+          numberOfRemainingValues[rem - 1].row = row;
+          numberOfRemainingValues[rem - 1].times++;
+        });
+      }
+    }
+
+    numberOfRemainingValues.forEach((remNumber, remNumberIndex) => {
+      if (remNumber.times === 1 && !table[remNumber.row][col].value) {
+        overrideValue({
+          table,
+          row: remNumber.row,
+          col,
+          value: remNumberIndex + 1,
+        });
+        numberOfFilled++;
+      }
+    });
+  }
+
+  return numberOfFilled;
+}
+
+export function fillNinePerNineUniqueValues({
+  table,
+  onEachCell,
+}: {
+  table: Array<Array<CellType>>;
+  onEachCell: (cell: CellType, remaining: number[]) => void;
+}): number {
+  let numberOfFilled = 0;
+  const ninePerNineIndexes = [
+    [0, 0],
+    [0, 3],
+    [0, 6],
+    [3, 0],
+    [3, 3],
+    [3, 6],
+    [6, 0],
+    [6, 3],
+    [6, 6],
+  ];
+
+  ninePerNineIndexes.forEach(item => {
+    const rowStart = item[0] - (item[0] % 3);
+    const rowEnd = rowStart + 3;
+    const colStart = item[1] - (item[1] % 3);
+    const colEnd = colStart + 3;
+
+    const numberOfRemainingValues = Array.from({ length: 9 }, () => ({
+      row: -1,
+      col: -1,
+      times: 0,
+    }));
+
+    for (let row = rowStart; row < rowEnd; row++) {
+      for (let col = colStart; col < colEnd; col++) {
+        if (!table[row][col].value) {
+          const remaining = table[row][col].remaining;
+          onEachCell(table[row][col], remaining);
+          remaining.forEach(rem => {
+            numberOfRemainingValues[rem - 1].col = col;
+            numberOfRemainingValues[rem - 1].row = row;
+            numberOfRemainingValues[rem - 1].times++;
+          });
+        }
+      }
+    }
+
+    numberOfRemainingValues.forEach((remNumber, remNumberIndex) => {
+      if (remNumber.times === 1 && !table[remNumber.row][remNumber.col].value) {
+        overrideValue({
+          table,
+          row: remNumber.row,
+          col: remNumber.row,
+          value: remNumberIndex + 1,
+        });
+        numberOfFilled++;
+      }
+    });
+  });
 
   return numberOfFilled;
 }
@@ -174,14 +255,18 @@ export function resolveEmptyBoard(): Table {
         };
 
         if (numberOfFilled < numberOfValuesToFill) {
-          const filled = fillRowsColsBlocks({
+          const rowsFilled = fillRowsUniqueValues({
             table,
             onEachCell,
           });
+          const columnsFilled = fillColumsUniqueValues({ table, onEachCell });
+          const squareFilled = fillNinePerNineUniqueValues({
+            table,
+            onEachCell,
+          });
+          numberOfFilled += rowsFilled + columnsFilled + squareFilled;
 
-          numberOfFilled += filled;
-
-          if (filled > 0) {
+          if (rowsFilled + columnsFilled + squareFilled > 0) {
             hasNewNumberFilled = true;
           }
         }
