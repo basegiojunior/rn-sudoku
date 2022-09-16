@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, View } from 'react-native';
 import ActionButton from 'src/components/ActionButton';
 import Cell from 'src/components/Cell';
-import useSudokuBoard, { CELL_VALUES } from 'src/utils/manipulateBoard';
+import useSudokuBoard, { CELL_VALUES } from 'src/hooks/useSudokuBoard';
 import styles from './Board.style';
 
 export const Board: React.FC = () => {
@@ -11,7 +11,7 @@ export const Board: React.FC = () => {
     newBoard,
     onPressActionCell,
     onPressCell,
-    getRemainingValuesFromTable,
+    globalCompletedValues,
   } = useSudokuBoard();
 
   return (
@@ -40,7 +40,7 @@ export const Board: React.FC = () => {
             variant="valueOption"
             onPress={() => onPressActionCell(cellValue)}
             value={cellValue}
-            disabled={!getRemainingValuesFromTable().includes(cellValue)}
+            disabled={globalCompletedValues.includes(cellValue)}
           />
         ))}
       </View>

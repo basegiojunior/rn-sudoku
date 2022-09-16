@@ -6,7 +6,6 @@ import styles, {
   makeBordersCellContainerStyle,
   makeBordersCellStyle,
 } from './Cell.style';
-import { CELL_VALUES } from 'src/utils/manipulateBoard';
 
 const VALUES_TEST = [
   [1, 2, 3],

@@ -1,14 +1,19 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { CellType, IndexesType, Table } from 'src/model/cell';
-import { createEmptyBoard } from './emptyBoard';
-import { getHighlightedIndexes } from './getIndexes';
-import { startBoard } from './startBoard';
+import { createEmptyBoard } from 'src/utils/emptyBoard';
+import { getHighlightedIndexes } from 'src/utils/getIndexes';
+import { startBoard } from 'src/utils/startBoard';
 
 export const CELL_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+export const TABLE_TOTAL_CELLS = 81;
 
 const useSudokuBoard = () => {
   const [table, setTable] = useState<Table>(createEmptyBoard());
   const [selectedCell, setSelectedCell] = useState<undefined | CellType>();
+  const globalCompletedValues = useMemo(
+    () => getCompletedValuesFromTable(),
+    [table],
+  );
 
   function clearSelectedCell() {
     table.forEach(line => {
@@ -30,7 +35,8 @@ const useSudokuBoard = () => {
         if (valuesToVerify.includes(cell.value)) {
           let hasError = false;
 
-          const verifyErrorCell = (indexes: IndexesType) => {
+          const highlightedIndexes = getHighlightedIndexes(cell.row, cell.col);
+          highlightedIndexes.forEach((indexes: IndexesType) => {
             if (
               table[indexes.row][indexes.col].value === cell.value &&
               (cell.col !== indexes.col || cell.row !== indexes.row)
@@ -38,10 +44,7 @@ const useSudokuBoard = () => {
               hasError = true;
               table[indexes.row][indexes.col].hasError = true;
             }
-          };
-
-          const highlightedIndexes = getHighlightedIndexes(cell.row, cell.col);
-          highlightedIndexes.forEach(verifyErrorCell);
+          });
 
           if (hasError) {
             table[cell.row][cell.col].hasError = true;
@@ -78,7 +81,6 @@ const useSudokuBoard = () => {
       value: cellToSelect.value,
     });
     table[cellToSelect.row][cellToSelect.col].selected = true;
-    table[cellToSelect.row][cellToSelect.col].highlighted = false;
   }
 
   function fillCellValue({ newValue }: { newValue: number }) {
@@ -96,46 +98,38 @@ const useSudokuBoard = () => {
     }
   }
 
-  function getRemainingValuesFromTable(): Array<number> {
-    const correctNumberOfValues: Array<number> = Array.from(
-      { length: 9 },
-      () => 0,
-    );
-
-    const completeValues: Array<number> = [];
+  function getCompletedValuesFromTable(): Array<number> {
+    const countValues: Record<number, number> = {};
+    const completedValues: Array<number> = [];
 
     table.forEach(row => {
-      row.forEach(cell => {
-        if (cell.value && !cell.hasError) {
-          correctNumberOfValues[cell.value - 1]++;
+      row.forEach(({ value, hasError }) => {
+        if (value && !hasError) {
+          countValues[value] = countValues[value] ? countValues[value] + 1 : 1;
 
-          if (correctNumberOfValues[cell.value - 1] === 9) {
-            completeValues.push(cell.value);
+          if (countValues[value] === 9) {
+            completedValues.push(value);
           }
         }
       });
     });
 
-    const remainingValues = CELL_VALUES.filter(
-      value => !completeValues.includes(value),
-    );
-
-    return remainingValues;
+    return completedValues;
   }
 
   function onPressCell(rowIndex: number, colIndex: number) {
     const newTable = [...table];
-    if (newTable[rowIndex][colIndex].selected) {
-      clearSelectedCell();
-      setSelectedCell(undefined);
-      return;
-    }
-
-    setSelectedCell(newTable[rowIndex][colIndex]);
+    const cell = newTable[rowIndex][colIndex];
 
     clearSelectedCell();
-    selectCell({ cellToSelect: newTable[rowIndex][colIndex] });
-    setTable(newTable);
+
+    if (cell.selected) {
+      setSelectedCell(undefined);
+    } else {
+      setSelectedCell(cell);
+      selectCell({ cellToSelect: cell });
+      setTable(newTable);
+    }
   }
 
   function newBoard() {
@@ -159,10 +153,10 @@ const useSudokuBoard = () => {
 
   return {
     table,
+    globalCompletedValues,
     newBoard,
     onPressActionCell,
     onPressCell,
-    getRemainingValuesFromTable,
   };
 };
 

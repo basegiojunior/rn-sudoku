@@ -1,4 +1,5 @@
-import { CellType, IndexesType, Table } from 'src/model/cell';
+import { TABLE_TOTAL_CELLS } from 'src/hooks/useSudokuBoard';
+import { IndexesType, Table } from 'src/model/cell';
 import { createEmptyBoard } from './emptyBoard';
 import {
   getAllBlocksIndexes,
@@ -15,17 +16,12 @@ const DIFFICULTY_INITIAL_FILLED: Record<EasyLevels, number> = {
   hard: 38,
 };
 
-export function overrideValue({
-  table,
-  row,
-  col,
-  value,
-}: {
-  table: Table;
-  row: number;
-  col: number;
-  value: number;
-}) {
+export function overrideValue(
+  table: Table,
+  row: number,
+  col: number,
+  value: number,
+) {
   table[row][col].value = value;
 
   const highlightedIndexes = getHighlightedIndexes(row, col);
@@ -37,41 +33,40 @@ export function overrideValue({
   });
 }
 
-function fillUniqueValues(
-  indexesArray: IndexesType[][],
-  table: Table,
-  onEachCell: (cell: CellType, remaining: number[]) => void,
-) {
+function fillUniqueValues(indexesArray: IndexesType[][], table: Table) {
   let numberOfFilled = 0;
 
-  indexesArray.forEach((indexes, index) => {
-    const numberOfRemainingValues = Array.from({ length: 9 }, () => ({
+  indexesArray.forEach(group => {
+    const countRemaining = Array.from({ length: 9 }, () => ({
       col: -1,
-      times: 0,
+      row: -1,
+      count: 0,
     }));
 
-    indexes.forEach(cellIndexes => {
-      const cell = table[cellIndexes.row][cellIndexes.col];
+    group.forEach(({ col, row }) => {
+      const cell = table[row][col];
 
       if (!cell.value) {
-        const remaining = table[cellIndexes.row][cellIndexes.col].remaining;
+        const remaining = table[row][col].remaining;
 
-        onEachCell(cell, remaining);
+        if (remaining.length === 1) {
+          overrideValue(table, row, col, remaining[0]);
+          numberOfFilled++;
+        }
+
         remaining.forEach(rem => {
-          numberOfRemainingValues[rem - 1].col = cellIndexes.col;
-          numberOfRemainingValues[rem - 1].times++;
+          countRemaining[rem - 1] = {
+            col,
+            row,
+            count: countRemaining[rem - 1].count + 1,
+          };
         });
       }
     });
 
-    numberOfRemainingValues.forEach((remNumber, remNumberIndex) => {
-      if (remNumber.times === 1 && !table[index][remNumber.col].value) {
-        overrideValue({
-          table,
-          row: index,
-          col: remNumber.col,
-          value: remNumberIndex + 1,
-        });
+    countRemaining.forEach(({ count, row, col }, remNumberIndex) => {
+      if (count === 1 && !table[row][col].value) {
+        overrideValue(table, row, col, remNumberIndex + 1);
 
         numberOfFilled++;
       }
@@ -81,139 +76,84 @@ function fillUniqueValues(
   return numberOfFilled;
 }
 
-export function fillRowsColsBlocks({
-  table,
-  onEachCell,
-}: {
-  table: Table;
-  onEachCell: (cell: CellType, remaining: number[]) => void;
-}): number {
+export function fillRowsColsBlocks({ table }: { table: Table }): number {
   let numberOfFilled = 0;
 
   const blocksIndexes = getAllBlocksIndexes();
   const rowsIndexes = getAllRowsIndexes();
   const colsIndexes = getAllColsIndexes();
 
-  numberOfFilled += fillUniqueValues(rowsIndexes, table, onEachCell);
-  numberOfFilled += fillUniqueValues(colsIndexes, table, onEachCell);
-  numberOfFilled += fillUniqueValues(blocksIndexes, table, onEachCell);
+  numberOfFilled += fillUniqueValues(rowsIndexes, table);
+  numberOfFilled += fillUniqueValues(colsIndexes, table);
+  numberOfFilled += fillUniqueValues(blocksIndexes, table);
 
   return numberOfFilled;
 }
 
 export function startBoard({ level = 'easy' }: { level?: EasyLevels }): Table {
-  const numberOfValuesToMantain = DIFFICULTY_INITIAL_FILLED[level];
-  const numberOfValuesToRemove = 81 - numberOfValuesToMantain;
-  const indexesToRemove: Array<IndexesType> = [];
-
-  while (indexesToRemove.length < numberOfValuesToRemove) {
-    const rowRandom = Math.floor(Math.random() * 9);
-    const colRandom = Math.floor(Math.random() * 9);
-
-    const newIndexToMantain = { row: rowRandom, col: colRandom };
-
-    if (!indexesToRemove.includes(newIndexToMantain)) {
-      indexesToRemove.push(newIndexToMantain);
-    }
-  }
+  const numberOfValuesToRemove =
+    TABLE_TOTAL_CELLS - DIFFICULTY_INITIAL_FILLED[level];
+  let countValuesRemoved = 0;
 
   const newTable = resolveEmptyBoard();
 
-  indexesToRemove.forEach(indexes => {
-    newTable[indexes.row][indexes.col].value = 0;
-  });
+  while (countValuesRemoved < numberOfValuesToRemove) {
+    const rowRandom = Math.floor(Math.random() * 9);
+    const colRandom = Math.floor(Math.random() * 9);
+
+    if (newTable[rowRandom][colRandom].value !== 0) {
+      newTable[rowRandom][colRandom].value = 0;
+      countValuesRemoved++;
+    }
+  }
 
   return newTable;
 }
 
 export function resolveEmptyBoard(): Table {
   let table = createEmptyBoard();
-  const numberOfValuesToFill = 81;
-  const indexesToFill: Array<IndexesType> = [];
-
-  table.forEach(row => {
-    row.forEach(cell => {
-      indexesToFill.push({ row: cell.row, col: cell.col });
-    });
-  });
 
   let numberOfFilled = 0;
-  let error = false;
   let success = false;
 
   while (!success) {
     numberOfFilled = 0;
-    error = false;
     table = createEmptyBoard();
 
-    indexesToFill.forEach(indexes => {
-      let hasNewNumberFilled = true;
+    table.forEach(rowCells => {
+      rowCells.forEach(({ row, col }) => {
+        let hasNewNumberFilled = true;
 
-      while (
-        hasNewNumberFilled &&
-        numberOfFilled < numberOfValuesToFill &&
-        !error
-      ) {
-        hasNewNumberFilled = false;
+        while (hasNewNumberFilled && numberOfFilled < TABLE_TOTAL_CELLS) {
+          const iterationFilled = fillRowsColsBlocks({
+            table,
+          });
 
-        const onEachCell = (cell: CellType, remainingValues: number[]) => {
-          if (remainingValues.length === 0 && !cell.value) {
-            error = true;
-          } else if (remainingValues.length === 1 && cell.value === 0) {
-            overrideValue({
-              table,
-              row: cell.row,
-              col: cell.col,
-              value: remainingValues[0],
-            });
+          numberOfFilled += iterationFilled;
 
-            hasNewNumberFilled = true;
+          if (iterationFilled === 0) {
+            hasNewNumberFilled = false;
+          }
+        }
+
+        if (table[row][col].value === 0 && numberOfFilled < TABLE_TOTAL_CELLS) {
+          const remainingValues = table[row][col].remaining;
+
+          if (remainingValues.length > 0) {
+            const randomIndexFromRemainingValues = Math.floor(
+              Math.random() * remainingValues.length,
+            );
+            const randomValue = remainingValues[randomIndexFromRemainingValues];
+            overrideValue(table, row, col, randomValue);
 
             numberOfFilled++;
           }
-        };
-
-        if (numberOfFilled < numberOfValuesToFill) {
-          const filled = fillRowsColsBlocks({
-            table,
-            onEachCell,
-          });
-
-          numberOfFilled += filled;
-
-          if (filled > 0) {
-            hasNewNumberFilled = true;
-          }
         }
-      }
-
-      if (
-        table[indexes.row][indexes.col].value === 0 &&
-        numberOfFilled < numberOfValuesToFill &&
-        !error
-      ) {
-        const remainingValues = table[indexes.row][indexes.col].remaining;
-
-        if (remainingValues.length > 0) {
-          const randomIndexFromRemainingValues = Math.floor(
-            Math.random() * remainingValues.length,
-          );
-          const randomValue = remainingValues[randomIndexFromRemainingValues];
-          overrideValue({
-            table,
-            row: indexes.row,
-            col: indexes.col,
-            value: randomValue,
-          });
-
-          numberOfFilled++;
-        }
-      }
+      });
     });
 
     if (numberOfFilled === 81) {
       success = true;
-    } else {
     }
   }
 

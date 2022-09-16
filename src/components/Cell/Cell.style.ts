@@ -6,11 +6,11 @@ export const makeBackgroundCellStyle = (
   selected: boolean,
   highlighted: boolean,
 ) => {
-  if (highlighted) {
-    return styles.highlighted;
-  }
   if (selected) {
     return styles.selectable;
+  }
+  if (highlighted) {
+    return styles.highlighted;
   }
   return null;
 };
