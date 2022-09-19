@@ -1,5 +1,5 @@
 import { IndexesType } from 'src/model/cell';
-import { CELL_VALUES } from './manipulateBoard';
+import { CELL_VALUES } from 'src/hooks/useSudokuBoard';
 
 export function getRowIndexes(rowOrigin: number): Array<IndexesType> {
   const indexes: Array<IndexesType> = [];

@@ -1,5 +1,5 @@
+import { CELL_VALUES } from 'src/hooks/useSudokuBoard';
 import { CellType } from 'src/model/cell';
-import { CELL_VALUES } from './manipulateBoard';
 
 export function createEmptyBoard(): Array<Array<CellType>> {
   const cells: Array<Array<CellType>> = [];
