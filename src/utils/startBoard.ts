@@ -1,5 +1,5 @@
 import { TABLE_TOTAL_CELLS } from 'src/hooks/useSudokuBoard';
-import { IndexesType, Table } from 'src/model/cell';
+import { DifficultyLevels, IndexesType, Table } from 'src/model/cell';
 import { createEmptyBoard } from './emptyBoard';
 import {
   getAllBlocksIndexes,
@@ -8,9 +8,7 @@ import {
   getHighlightedIndexes,
 } from './getIndexes';
 
-type EasyLevels = 'easy' | 'medium' | 'hard';
-
-const DIFFICULTY_INITIAL_FILLED: Record<EasyLevels, number> = {
+const DIFFICULTY_INITIAL_FILLED: Record<DifficultyLevels, number> = {
   easy: 51,
   medium: 44,
   hard: 38,
@@ -90,7 +88,11 @@ export function fillRowsColsBlocks({ table }: { table: Table }): number {
   return numberOfFilled;
 }
 
-export function startBoard({ level = 'easy' }: { level?: EasyLevels }): Table {
+export function startBoard({
+  level = 'easy',
+}: {
+  level?: DifficultyLevels;
+}): Table {
   const numberOfValuesToRemove =
     TABLE_TOTAL_CELLS - DIFFICULTY_INITIAL_FILLED[level];
   let countValuesRemoved = 0;

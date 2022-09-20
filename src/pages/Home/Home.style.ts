@@ -13,7 +13,11 @@ const styles = StyleSheet.create({
     color: '#382e2e',
     marginBottom: 50,
   },
-  newGameButtonContainer: { width: '100%', marginVertical: 16 },
+  newGameButtonContainer: {
+    width: '100%',
+    marginBottom: 16,
+    marginTop: 32,
+  },
 });
 
 export default styles;

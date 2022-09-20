@@ -24,7 +24,7 @@ export const Board: React.FC = () => {
               colIndex={colIndex}
               rowIndex={rowIndex}
               onPress={onPressCell}
-              key={`${rowIndex}+${colIndex}`}
+              key={`${colIndex}col`}
               hasError={cell.hasError}
               isEqualToSelected={cell.isEqualToSelected}
               valuesTest={cell.remaining}

@@ -15,3 +15,5 @@ export type IndexesType = {
 };
 
 export type Table = Array<Array<CellType>>;
+
+export type DifficultyLevels = 'easy' | 'medium' | 'hard';
