@@ -27,7 +27,6 @@ export const Board: React.FC = () => {
               key={`${colIndex}col`}
               hasError={cell.hasError}
               isEqualToSelected={cell.isEqualToSelected}
-              valuesTest={cell.remaining}
             />
           ))}
         </View>
@@ -37,7 +36,6 @@ export const Board: React.FC = () => {
         {CELL_VALUES.map(cellValue => (
           <ActionButton
             key={cellValue}
-            variant="valueOption"
             onPress={() => onPressActionCell(cellValue)}
             value={cellValue}
             disabled={globalCompletedValues.includes(cellValue)}

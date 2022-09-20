@@ -7,5 +7,4 @@ export interface CellProps {
   colIndex: number;
   hasError: boolean;
   isEqualToSelected: boolean;
-  valuesTest?: Array<number>;
 }
