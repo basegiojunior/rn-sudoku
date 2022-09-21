@@ -2,17 +2,14 @@ import React from 'react';
 import { Button, View } from 'react-native';
 import ActionButton from 'src/components/ActionButton';
 import Cell from 'src/components/Cell';
+import { useGameContext } from 'src/contexts/useGameContext';
 import useSudokuBoard, { CELL_VALUES } from 'src/hooks/useSudokuBoard';
 import styles from './Board.style';
 
 export const Board: React.FC = () => {
-  const {
-    table,
-    newBoard,
-    onPressActionCell,
-    onPressCell,
-    globalCompletedValues,
-  } = useSudokuBoard();
+  const { onPressActionCell, onPressCell, globalCompletedValues } =
+    useSudokuBoard();
+  const { table, newGame } = useGameContext();
 
   return (
     <View style={styles.container}>
@@ -42,7 +39,7 @@ export const Board: React.FC = () => {
           />
         ))}
       </View>
-      <Button title="new board" onPress={newBoard} />
+      <Button title="new board" onPress={newGame} />
     </View>
   );
 };

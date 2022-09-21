@@ -9,10 +9,15 @@
  */
 
 import React from 'react';
+import { GameContextProvider } from './contexts/useGameContext';
 import MainRoutes from './routes/Routes';
 
 const App = () => {
-  return <MainRoutes />;
+  return (
+    <GameContextProvider>
+      <MainRoutes />
+    </GameContextProvider>
+  );
 };
 
 export default App;

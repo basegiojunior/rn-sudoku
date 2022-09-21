@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SelectorProps } from './Selector.types';
 import styles from './Selector.style';
-import { DifficultyLevels } from 'src/model/cell';
 import ArrowSelector from './components/ArrowSelector';
 
 export const Selector: React.FC<SelectorProps> = props => {
@@ -39,7 +38,7 @@ export const Selector: React.FC<SelectorProps> = props => {
           <View
             key={difficulty}
             style={[styles.textContainer, { width: textSize }]}>
-            <Text style={styles.text}>{difficulty}</Text>
+            <Text style={styles.text}>{props.translateItem(difficulty)}</Text>
           </View>
         ))}
       </ScrollView>

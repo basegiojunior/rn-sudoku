@@ -1,14 +1,13 @@
 import { useMemo, useState } from 'react';
+import { useGameContext } from 'src/contexts/useGameContext';
 import { CellType, IndexesType, Table } from 'src/model/cell';
-import { createEmptyBoard } from 'src/utils/emptyBoard';
 import { getHighlightedIndexes } from 'src/utils/getIndexes';
-import { startBoard } from 'src/utils/startBoard';
 
 export const CELL_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 export const TABLE_TOTAL_CELLS = 81;
 
 const useSudokuBoard = () => {
-  const [table, setTable] = useState<Table>(createEmptyBoard());
+  const { table, changeTable } = useGameContext();
   const [selectedCell, setSelectedCell] = useState<undefined | CellType>();
   const globalCompletedValues = useMemo(
     () => getCompletedValuesFromTable(),
@@ -128,14 +127,8 @@ const useSudokuBoard = () => {
     } else {
       setSelectedCell(cell);
       selectCell({ cellToSelect: cell });
-      setTable(newTable);
+      changeTable(newTable);
     }
-  }
-
-  function newBoard() {
-    const newTable = startBoard({ level: 'hard' });
-
-    setTable(newTable);
   }
 
   function onPressActionCell(cellValue: number) {
@@ -146,15 +139,13 @@ const useSudokuBoard = () => {
       fillCellValue({
         newValue,
       });
-      setTable(newTable);
+      changeTable(newTable);
       setSelectedCell({ ...selectedCell, value: newValue });
     }
   }
 
   return {
-    table,
     globalCompletedValues,
-    newBoard,
     onPressActionCell,
     onPressCell,
   };

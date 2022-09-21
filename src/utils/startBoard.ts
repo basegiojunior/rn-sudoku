@@ -1,5 +1,6 @@
 import { TABLE_TOTAL_CELLS } from 'src/hooks/useSudokuBoard';
-import { DifficultyLevels, IndexesType, Table } from 'src/model/cell';
+import { IndexesType, Table } from 'src/model/cell';
+import { DifficultyLevels } from 'src/model/game';
 import { createEmptyBoard } from './emptyBoard';
 import {
   getAllBlocksIndexes,
@@ -89,7 +90,7 @@ export function fillRowsColsBlocks({ table }: { table: Table }): number {
 }
 
 export function startBoard({
-  level = 'easy',
+  level = DifficultyLevels.EASY,
 }: {
   level?: DifficultyLevels;
 }): Table {
