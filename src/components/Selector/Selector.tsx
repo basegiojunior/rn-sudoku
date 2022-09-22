@@ -4,24 +4,39 @@ import { SelectorProps } from './Selector.types';
 import styles from './Selector.style';
 import ArrowSelector from './components/ArrowSelector';
 
-export const Selector: React.FC<SelectorProps> = props => {
+export const Selector = <T extends unknown>(props: SelectorProps<T>) => {
   const [textSize, setTextSize] = useState(10000);
   const scrollRef = useRef<ScrollView>(null);
+  const [indexSelected, setIndexSelected] = useState(
+    props.items.findIndex(item => item === props.itemSelected) || 0,
+  );
 
-  function scrollToDifficulty(dififculty: number) {
-    scrollRef?.current?.scrollTo({ x: textSize * dififculty });
+  function changeIndex(newIndex: number) {
+    scrollRef?.current?.scrollTo({ x: textSize * newIndex });
+    setIndexSelected(newIndex);
+    props.onChange(props.items[newIndex]);
   }
 
-  useEffect(() => {
-    scrollToDifficulty(props.itemIndexSelected);
-  }, [props.itemIndexSelected]);
+  function onPressChevronLeft() {
+    if (indexSelected > 0) {
+      const newIndexSelected = indexSelected - 1;
+      changeIndex(newIndexSelected);
+    }
+  }
+
+  function onPressChevronRight() {
+    if (indexSelected < 2) {
+      const newIndexSelected = indexSelected + 1;
+      changeIndex(newIndexSelected);
+    }
+  }
 
   return (
     <View style={styles.container}>
       <ArrowSelector
-        onPress={props.onPressLeft}
+        onPress={onPressChevronLeft}
         direction="left"
-        enable={props.itemIndexSelected > 0}
+        enable={indexSelected > 0}
       />
 
       <ScrollView
@@ -34,7 +49,7 @@ export const Selector: React.FC<SelectorProps> = props => {
         scrollEnabled={false}
         contentContainerStyle={styles.scrollContent}
         ref={scrollRef}>
-        {props.items.map(difficulty => (
+        {props.items.map((difficulty: any) => (
           <View
             key={difficulty}
             style={[styles.textContainer, { width: textSize }]}>
@@ -44,9 +59,9 @@ export const Selector: React.FC<SelectorProps> = props => {
       </ScrollView>
 
       <ArrowSelector
-        onPress={props.onPressRight}
+        onPress={onPressChevronRight}
         direction="right"
-        enable={props.itemIndexSelected < props.items.length - 1}
+        enable={indexSelected < props.items.length - 1}
       />
     </View>
   );

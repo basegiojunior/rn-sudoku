@@ -1,14 +1,15 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Table } from 'src/model/cell';
 import { DifficultyLevels } from 'src/model/game';
+import { getItem, setItem, STORAGE_KEYS } from 'src/storage/asyncStorage';
 import { createEmptyBoard } from 'src/utils/emptyBoard';
 import { startBoard } from 'src/utils/startBoard';
 
 type GameContextProps = {
   table: Table;
-  difficultySelected: number;
+  difficultySelected: DifficultyLevels;
   changeTable: (table: Table) => void;
-  changeDifficultyIndex: (index: number) => void;
+  changeDifficultyIndex: (difficulty: DifficultyLevels) => void;
   newGame: () => void;
 };
 
@@ -19,24 +20,45 @@ const GameContext = createContext(DEFAULT_VALUE);
 export const GameContextProvider: React.FC<{
   children: React.ReactElement;
 }> = props => {
-  const [table, setTable] = useState<Table>(createEmptyBoard());
-  const [difficultySelected, setDifficultySelected] = useState(0);
+  const [table, setTable] = useState<Table>([[]]);
+  const [difficultySelected, setDifficultySelected] = useState(
+    DifficultyLevels.EASY,
+  );
 
   function changeTable(newTable: Table) {
     setTable(newTable);
+    setItem(STORAGE_KEYS.BOARD, newTable);
   }
 
-  function changeDifficultyIndex(index: number) {
-    setDifficultySelected(index);
+  function changeDifficultyIndex(difficulty: DifficultyLevels) {
+    setDifficultySelected(difficulty);
   }
 
-  function newGame() {
+  async function newGame() {
     const newTable = startBoard({
-      level: Object.values(DifficultyLevels)[difficultySelected],
+      level: difficultySelected,
     });
+    setTable(newTable);
 
-    changeTable(newTable);
+    try {
+      await setItem(STORAGE_KEYS.BOARD, newTable);
+    } catch (error) {
+      throw error;
+    }
   }
+
+  useEffect(() => {
+    const getGameStored = async () => {
+      try {
+        const storedGame = await getItem(STORAGE_KEYS.BOARD);
+        setTable(storedGame);
+      } catch {
+        newGame();
+      }
+    };
+
+    getGameStored();
+  }, []);
 
   return (
     <GameContext.Provider

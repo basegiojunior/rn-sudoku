@@ -1,27 +1,38 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-enum STORAGE_KEYS {
+export enum STORAGE_KEYS {
   BOARD = 'board',
 }
 
-export async function setItem(key: STORAGE_KEYS, value: any) {
+export async function setItem(key: STORAGE_KEYS, value: any, isString = false) {
   try {
-    const jsonValue = JSON.stringify(value);
-    await AsyncStorage.setItem(key, jsonValue);
+    let stringValue;
+    if (isString) {
+      stringValue = value;
+    } else {
+      stringValue = JSON.stringify(value);
+    }
+
+    await AsyncStorage.setItem(key, stringValue);
   } catch (error) {
-    return error;
+    throw error;
   }
 }
 
-export async function getItem(key: STORAGE_KEYS) {
+export async function getItem(key: STORAGE_KEYS, isString = false) {
   try {
-    const value = await AsyncStorage.getItem(key);
-    if (value !== null) {
-      return value;
+    const stringValue = await AsyncStorage.getItem(key);
+    if (stringValue !== null) {
+      if (isString) {
+        return stringValue;
+      } else {
+        const jsonValue = stringValue != null ? JSON.parse(stringValue) : null;
+        return jsonValue;
+      }
     }
 
     throw new Error('key has empty value');
   } catch (error) {
-    return error;
+    throw error;
   }
 }

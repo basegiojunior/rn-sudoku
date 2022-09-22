@@ -18,18 +18,6 @@ export const Home: React.FC = () => {
     return DIFFICULTY_TRANSLATION[difficulty];
   }
 
-  function onPressChevronLeft() {
-    if (difficultySelected > 0) {
-      changeDifficultyIndex(difficultySelected - 1);
-    }
-  }
-
-  function onPressChevronRight() {
-    if (difficultySelected < 2) {
-      changeDifficultyIndex(difficultySelected + 1);
-    }
-  }
-
   function onPressNewGame() {
     newGame();
     navigate(RoutesList.Board);
@@ -46,9 +34,8 @@ export const Home: React.FC = () => {
       <Selector
         items={Object.values(DifficultyLevels)}
         translateItem={translateDifficulty}
-        onPressLeft={onPressChevronLeft}
-        onPressRight={onPressChevronRight}
-        itemIndexSelected={difficultySelected}
+        onChange={changeDifficultyIndex}
+        itemSelected={difficultySelected}
       />
       <View style={styles.newGameButtonContainer}>
         <Button title="Novo Jogo" onPress={onPressNewGame} />

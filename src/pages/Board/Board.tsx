@@ -39,7 +39,6 @@ export const Board: React.FC = () => {
           />
         ))}
       </View>
-      <Button title="new board" onPress={newGame} />
     </View>
   );
 };

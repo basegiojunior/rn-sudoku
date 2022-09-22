@@ -1,7 +1,6 @@
-export interface SelectorProps {
-  onPressRight: () => void;
-  onPressLeft: () => void;
-  items: string[];
-  translateItem: (item: any) => string;
-  itemIndexSelected: number;
+export interface SelectorProps<T> {
+  onChange: (newValue: T) => void;
+  items: T[];
+  translateItem: (item: T) => string;
+  itemSelected: T;
 }
