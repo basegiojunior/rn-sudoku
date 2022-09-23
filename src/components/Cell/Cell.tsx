@@ -17,7 +17,10 @@ export const Cell: React.FC<CellProps> = props => {
         onPress={() => props.onPress(props.rowIndex, props.colIndex)}
         style={[
           styles.cell,
-          makeBackgroundCellStyle(props.cell.selected, props.cell.highlighted),
+          makeBackgroundCellStyle(
+            props.cell.selected || props.isEqualToSelected,
+            props.cell.highlighted,
+          ),
           ...makeBordersCellStyle(props.rowIndex, props.colIndex),
         ]}>
         {props.cell.value !== 0 && (

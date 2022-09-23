@@ -3,10 +3,10 @@ import { Dimensions, StyleSheet } from 'react-native';
 const cellSize = Math.floor((Dimensions.get('window').width - 30) / 9);
 
 export const makeBackgroundCellStyle = (
-  selected: boolean,
+  isEqualToSelected: boolean,
   highlighted: boolean,
 ) => {
-  if (selected) {
+  if (isEqualToSelected) {
     return styles.selectable;
   }
   if (highlighted) {
@@ -51,39 +51,32 @@ export const makeBordersCellContainerStyle = (row: number, col: number) => {
   return arrayStyles;
 };
 
+const borderColor = '#cccccc';
+const highlightedBackgroundColor = '#e2e4eb';
+
 const styles = StyleSheet.create({
   cellText: {
     fontSize: cellSize * 0.7,
     color: '#2e2e2e',
     fontWeight: 'normal',
   },
-  textTest: {
-    fontSize: cellSize * 0.3,
-    lineHeight: cellSize * 0.3,
-  },
-  textTestShow: {
-    color: '#3d3d3d',
-  },
-  textTestHide: {
-    color: 'transparent',
-  },
   cell: {
     width: cellSize,
     height: cellSize,
     borderTopWidth: 1,
-    borderTopColor: '#cccccc',
+    borderTopColor: borderColor,
     borderRightWidth: 1,
-    borderRightColor: '#cccccc',
+    borderRightColor: borderColor,
     borderBottomWidth: 1,
-    borderBottomColor: '#cccccc',
+    borderBottomColor: borderColor,
     borderLeftWidth: 1,
-    borderLeftColor: '#cccccc',
+    borderLeftColor: borderColor,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#ffffff',
   },
   highlighted: {
-    backgroundColor: '#e0e4ee',
+    backgroundColor: highlightedBackgroundColor,
   },
   hasErrorCellText: {
     color: '#a70f0f',
@@ -92,7 +85,7 @@ const styles = StyleSheet.create({
     color: '#0f19a7',
   },
   selectable: {
-    backgroundColor: '#bdc6e2',
+    backgroundColor: '#c0cae4',
   },
   withBottomDivider: {
     borderBottomWidth: 2,

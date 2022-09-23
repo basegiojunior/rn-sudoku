@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Table } from 'src/model/cell';
 import { DifficultyLevels } from 'src/model/game';
 import { getItem, setItem, STORAGE_KEYS } from 'src/storage/asyncStorage';
-import { createEmptyBoard } from 'src/utils/emptyBoard';
 import { startBoard } from 'src/utils/startBoard';
 
 type GameContextProps = {

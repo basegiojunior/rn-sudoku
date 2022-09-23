@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { ArrowSelectorProps } from './ArrowSelector.types';
 import ChevronLeft from 'src/assets/chevron-left.svg';
 import ChevronRight from 'src/assets/chevron-right.svg';

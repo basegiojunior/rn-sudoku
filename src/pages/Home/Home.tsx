@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { Button as ReactButton, Pressable, Text, View } from 'react-native';
+import React from 'react';
+import { Text, View } from 'react-native';
 import Button from 'src/components/Button';
 import Selector from 'src/components/Selector';
 import { useGameContext } from 'src/contexts/useGameContext';
@@ -31,20 +31,24 @@ export const Home: React.FC = () => {
     <View style={styles.container}>
       <Text style={styles.gameTitle}>SUDOKU</Text>
 
-      <Selector
-        items={Object.values(DifficultyLevels)}
-        translateItem={translateDifficulty}
-        onChange={changeDifficultyIndex}
-        itemSelected={difficultySelected}
-      />
-      <View style={styles.newGameButtonContainer}>
+      <View style={styles.selectorContainer}>
+        <Selector
+          items={Object.values(DifficultyLevels)}
+          translateItem={translateDifficulty}
+          onChange={changeDifficultyIndex}
+          itemSelected={difficultySelected}
+        />
+      </View>
+      <View style={styles.buttonContainer}>
         <Button title="Novo Jogo" onPress={onPressNewGame} />
       </View>
-      <Button
-        title="Continuar"
-        variant="secondary"
-        onPress={onPressContinueGame}
-      />
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Continuar"
+          variant="secondary"
+          onPress={onPressContinueGame}
+        />
+      </View>
     </View>
   );
 };

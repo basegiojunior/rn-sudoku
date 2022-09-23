@@ -1,15 +1,28 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { Button, View } from 'react-native';
+import { View } from 'react-native';
 import ActionButton from 'src/components/ActionButton';
 import Cell from 'src/components/Cell';
+import Modal from 'src/components/Modal';
 import { useGameContext } from 'src/contexts/useGameContext';
 import useSudokuBoard, { CELL_VALUES } from 'src/hooks/useSudokuBoard';
+import { MainNavigationProps, RoutesList } from 'src/routes/Routes.types';
 import styles from './Board.style';
+import FinishGame from './components/FinishGame';
 
 export const Board: React.FC = () => {
   const { onPressActionCell, onPressCell, globalCompletedValues } =
     useSudokuBoard();
   const { table, newGame } = useGameContext();
+  const { navigate } = useNavigation<MainNavigationProps>();
+
+  function onPressHome() {
+    navigate(RoutesList.Home);
+  }
+
+  function onPressNewGame() {
+    newGame();
+  }
 
   return (
     <View style={styles.container}>
@@ -39,6 +52,10 @@ export const Board: React.FC = () => {
           />
         ))}
       </View>
+
+      <Modal show={globalCompletedValues.length === 9}>
+        <FinishGame onPressHome={onPressHome} onPressNewGame={onPressNewGame} />
+      </Modal>
     </View>
   );
 };

@@ -11,16 +11,16 @@ export const buttonVariantStyle: Record<ButtonVariant, ViewStyle> = {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    borderRadius: 4,
+  buttonFullWidth: {
+    flex: 1,
   },
   button: {
-    width: '100%',
+    borderRadius: 4,
     height: 45,
+    flex: 0,
+    paddingHorizontal: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 4,
   },
   title: {
     fontWeight: 'bold',
