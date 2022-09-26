@@ -12,6 +12,7 @@ export function createEmptyBoard(): Array<Array<CellType>> {
         highlighted: false,
         selected: false,
         value: 0,
+        valueSolved: 0,
         hasError: false,
         isEqualToSelected: false,
         remaining: CELL_VALUES,
