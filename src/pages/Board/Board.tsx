@@ -9,7 +9,6 @@ import Modal from 'src/components/Modal';
 import { useGameContext } from 'src/contexts/useGameContext';
 import useSudokuBoard, { CELL_VALUES } from 'src/hooks/useSudokuBoard';
 import { MainNavigationProps, RoutesList } from 'src/routes/Routes.types';
-import { resolveBoard } from 'src/utils/resolveSudoku';
 import styles from './Board.style';
 import FinishGame from './components/FinishGame';
 

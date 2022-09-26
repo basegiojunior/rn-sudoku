@@ -1,5 +1,6 @@
 import { TABLE_TOTAL_CELLS } from 'src/hooks/useSudokuBoard';
 import { IndexesType, Table } from 'src/model/cell';
+import { createEmptyBoard } from './emptyBoard';
 import {
   getAllBlocksIndexes,
   getAllColsIndexes,
@@ -83,25 +84,13 @@ export function fillRowsColsBlocks({ table }: { table: Table }): number {
   return numberOfFilled;
 }
 
-export function resolveBoard(tableToSolve: Table): Table {
-  let startNumberOfFilled = 0;
-  let numberOfFilled = 0;
-
-  tableToSolve.forEach(row => {
-    row.forEach(cell => {
-      if (cell.value !== 0) {
-        startNumberOfFilled++;
-      }
-    });
-  });
-
+export function resolveEmptyBoard(): Table {
   let success = false;
-
   let table: Table = [[]];
 
   while (!success) {
-    numberOfFilled = startNumberOfFilled;
-    table = deepBoardCopy(tableToSolve);
+    let numberOfFilled = 0;
+    table = createEmptyBoard();
 
     table.forEach(rowCells => {
       rowCells.forEach(({ row, col }) => {
