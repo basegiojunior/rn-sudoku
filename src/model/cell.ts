@@ -6,6 +6,7 @@ export type CellType = {
   hasError: boolean;
   isEqualToSelected: boolean;
   value: number;
+  valueSolved: number;
   remaining: number[];
 };
 

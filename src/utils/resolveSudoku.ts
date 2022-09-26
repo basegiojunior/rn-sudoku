@@ -15,6 +15,7 @@ export function overrideValue(
   value: number,
 ) {
   table[row][col].value = value;
+  table[row][col].valueSolved = value;
 
   const highlightedIndexes = getHighlightedIndexes(row, col);
 
@@ -83,13 +84,23 @@ export function fillRowsColsBlocks({ table }: { table: Table }): number {
 }
 
 export function resolveBoard(tableToSolve: Table): Table {
+  let startNumberOfFilled = 0;
   let numberOfFilled = 0;
+
+  tableToSolve.forEach(row => {
+    row.forEach(cell => {
+      if (cell.value !== 0) {
+        startNumberOfFilled++;
+      }
+    });
+  });
+
   let success = false;
 
   let table: Table = [[]];
 
   while (!success) {
-    numberOfFilled = 0;
+    numberOfFilled = startNumberOfFilled;
     table = deepBoardCopy(tableToSolve);
 
     table.forEach(rowCells => {

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Table } from 'src/model/cell';
 import { DifficultyLevels } from 'src/model/game';
 import { getItem, setItem, STORAGE_KEYS } from 'src/storage/asyncStorage';
+import { getRowIndexes } from 'src/utils/getIndexes';
 import { startBoard } from 'src/utils/startBoard';
 
 type GameContextProps = {
@@ -10,6 +11,9 @@ type GameContextProps = {
   changeTable: (table: Table) => void;
   changeDifficultyIndex: (difficulty: DifficultyLevels) => void;
   newGame: () => void;
+  solveSudoku: () => void;
+  changeWon: (newWon: boolean) => void;
+  won: boolean;
 };
 
 const DEFAULT_VALUE: GameContextProps = {} as GameContextProps;
@@ -20,6 +24,7 @@ export const GameContextProvider: React.FC<{
   children: React.ReactElement;
 }> = props => {
   const [table, setTable] = useState<Table>([[]]);
+  const [won, setWon] = useState<boolean>(false);
   const [difficultySelected, setDifficultySelected] = useState(
     DifficultyLevels.EASY,
   );
@@ -46,6 +51,21 @@ export const GameContextProvider: React.FC<{
     }
   }
 
+  function solveSudoku() {
+    const newTable = [...table];
+    table.forEach((row, rowIndex) => {
+      row.forEach((cell, colIndex) => {
+        newTable[rowIndex][colIndex].value = cell.valueSolved;
+      });
+    });
+
+    changeTable(newTable);
+  }
+
+  function changeWon(newWon: boolean) {
+    setWon(newWon);
+  }
+
   useEffect(() => {
     const getGameStored = async () => {
       try {
@@ -63,8 +83,11 @@ export const GameContextProvider: React.FC<{
     <GameContext.Provider
       value={{
         table,
+        won,
         changeTable,
+        solveSudoku,
         newGame,
+        changeWon,
         changeDifficultyIndex,
         difficultySelected,
       }}>

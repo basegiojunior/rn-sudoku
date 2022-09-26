@@ -1,14 +1,34 @@
-import { TABLE_TOTAL_CELLS } from 'src/hooks/useSudokuBoard';
-import { IndexesType, Table } from 'src/model/cell';
+import { CELL_VALUES, TABLE_TOTAL_CELLS } from 'src/hooks/useSudokuBoard';
+import { CellType, Table } from 'src/model/cell';
 import { DifficultyLevels } from 'src/model/game';
 import { createEmptyBoard } from './emptyBoard';
-import {
-  getAllBlocksIndexes,
-  getAllColsIndexes,
-  getAllRowsIndexes,
-  getHighlightedIndexes,
-} from './getIndexes';
+import { getHighlightedIndexes } from './getIndexes';
 import { resolveBoard } from './resolveSudoku';
+
+export function getRemainingValuesByIndex({
+  table,
+  row,
+  col,
+}: {
+  table: Array<Array<CellType>>;
+  row: number;
+  col: number;
+}): Array<number> {
+  const highlightedIndexes = getHighlightedIndexes(row, col);
+
+  const highlightedCells = highlightedIndexes.map(
+    index => table[index.row][index.col],
+  );
+
+  const uniqueHighlightedValues = [
+    ...new Set(highlightedCells.map(cell => cell.value)),
+  ];
+  const remainingValues = CELL_VALUES.filter(
+    value => !uniqueHighlightedValues.includes(value),
+  );
+
+  return remainingValues;
+}
 
 const DIFFICULTY_INITIAL_FILLED: Record<DifficultyLevels, number> = {
   easy: 51,
@@ -36,6 +56,18 @@ export function startBoard({
       countValuesRemoved++;
     }
   }
+
+  newTable.forEach((row, rowIndex) => {
+    row.forEach((cell, colIndex) => {
+      if (cell.value === 0) {
+        newTable[rowIndex][colIndex].remaining = getRemainingValuesByIndex({
+          table: newTable,
+          row: rowIndex,
+          col: colIndex,
+        });
+      }
+    });
+  });
 
   return newTable;
 }

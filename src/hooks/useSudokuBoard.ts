@@ -7,12 +7,16 @@ export const CELL_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 export const TABLE_TOTAL_CELLS = 81;
 
 const useSudokuBoard = () => {
-  const { table, changeTable } = useGameContext();
+  const { table, changeTable, changeWon } = useGameContext();
   const [selectedCell, setSelectedCell] = useState<undefined | CellType>();
-  const globalCompletedValues = useMemo(
-    () => getCompletedValuesFromTable(),
-    [table],
-  );
+  const globalCompletedValues = useMemo(() => {
+    const countCompleteValues = getCompletedValuesFromTable();
+    if (countCompleteValues.length < 9) {
+      changeWon(false);
+    }
+
+    return countCompleteValues;
+  }, [table]);
 
   function clearSelectedCell() {
     table.forEach(line => {
@@ -97,11 +101,11 @@ const useSudokuBoard = () => {
     }
   }
 
-  function getCompletedValuesFromTable(): Array<number> {
+  function getCompletedValuesFromTable(newTable = table): Array<number> {
     const countValues: Record<number, number> = {};
     const completedValues: Array<number> = [];
 
-    table.forEach(row => {
+    newTable.forEach(row => {
       row.forEach(({ value, hasError }) => {
         if (value && !hasError) {
           countValues[value] = countValues[value] ? countValues[value] + 1 : 1;
@@ -132,7 +136,7 @@ const useSudokuBoard = () => {
   }
 
   function onPressActionCell(cellValue: number) {
-    if (selectedCell) {
+    if (selectedCell && globalCompletedValues.length < 9) {
       const newTable = [...table];
       const newValue = selectedCell?.value === cellValue ? 0 : cellValue;
 
@@ -141,12 +145,16 @@ const useSudokuBoard = () => {
       });
       changeTable(newTable);
       setSelectedCell({ ...selectedCell, value: newValue });
+
+      if (getCompletedValuesFromTable(newTable).length === 9) {
+        changeWon(true);
+      }
     }
   }
 
   return {
-    globalCompletedValues,
     onPressActionCell,
+    globalCompletedValues,
     onPressCell,
   };
 };

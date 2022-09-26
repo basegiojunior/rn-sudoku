@@ -9,13 +9,14 @@ import Modal from 'src/components/Modal';
 import { useGameContext } from 'src/contexts/useGameContext';
 import useSudokuBoard, { CELL_VALUES } from 'src/hooks/useSudokuBoard';
 import { MainNavigationProps, RoutesList } from 'src/routes/Routes.types';
+import { resolveBoard } from 'src/utils/resolveSudoku';
 import styles from './Board.style';
 import FinishGame from './components/FinishGame';
 
 export const Board: React.FC = () => {
   const { onPressActionCell, onPressCell, globalCompletedValues } =
     useSudokuBoard();
-  const { table, newGame } = useGameContext();
+  const { table, newGame, solveSudoku, won } = useGameContext();
   const { navigate, goBack } = useNavigation<MainNavigationProps>();
 
   function onPressHome() {
@@ -30,7 +31,9 @@ export const Board: React.FC = () => {
     goBack();
   }
 
-  function onPressGiveUp() {}
+  function onPressGiveUp() {
+    solveSudoku();
+  }
 
   return (
     <>
@@ -66,7 +69,7 @@ export const Board: React.FC = () => {
           ))}
         </View>
 
-        <Modal show={globalCompletedValues.length === 9}>
+        <Modal show={won}>
           <FinishGame
             onPressHome={onPressHome}
             onPressNewGame={onPressNewGame}
