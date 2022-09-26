@@ -14,9 +14,9 @@ import styles from './Board.style';
 import FinishGame from './components/FinishGame';
 
 export const Board: React.FC = () => {
-  const { onPressActionCell, onPressCell, globalCompletedValues } =
+  const { onPressActionCell, onPressCell, globalCompletedValues, won } =
     useSudokuBoard();
-  const { table, newGame, solveSudoku, won } = useGameContext();
+  const { table, newGame, solveSudoku } = useGameContext();
   const { navigate, goBack } = useNavigation<MainNavigationProps>();
 
   function onPressHome() {

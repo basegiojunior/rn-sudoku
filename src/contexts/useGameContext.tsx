@@ -12,8 +12,6 @@ type GameContextProps = {
   changeDifficultyIndex: (difficulty: DifficultyLevels) => void;
   newGame: () => void;
   solveSudoku: () => void;
-  changeWon: (newWon: boolean) => void;
-  won: boolean;
 };
 
 const DEFAULT_VALUE: GameContextProps = {} as GameContextProps;
@@ -24,7 +22,6 @@ export const GameContextProvider: React.FC<{
   children: React.ReactElement;
 }> = props => {
   const [table, setTable] = useState<Table>([[]]);
-  const [won, setWon] = useState<boolean>(false);
   const [difficultySelected, setDifficultySelected] = useState(
     DifficultyLevels.EASY,
   );
@@ -62,10 +59,6 @@ export const GameContextProvider: React.FC<{
     changeTable(newTable);
   }
 
-  function changeWon(newWon: boolean) {
-    setWon(newWon);
-  }
-
   useEffect(() => {
     const getGameStored = async () => {
       try {
@@ -83,11 +76,9 @@ export const GameContextProvider: React.FC<{
     <GameContext.Provider
       value={{
         table,
-        won,
         changeTable,
         solveSudoku,
         newGame,
-        changeWon,
         changeDifficultyIndex,
         difficultySelected,
       }}>

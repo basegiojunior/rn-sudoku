@@ -7,12 +7,13 @@ export const CELL_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 export const TABLE_TOTAL_CELLS = 81;
 
 const useSudokuBoard = () => {
-  const { table, changeTable, changeWon } = useGameContext();
+  const { table, changeTable } = useGameContext();
   const [selectedCell, setSelectedCell] = useState<undefined | CellType>();
+  const [won, setWon] = useState<boolean>(false);
   const globalCompletedValues = useMemo(() => {
     const countCompleteValues = getCompletedValuesFromTable();
     if (countCompleteValues.length < 9) {
-      changeWon(false);
+      setWon(false);
     }
 
     return countCompleteValues;
@@ -147,7 +148,7 @@ const useSudokuBoard = () => {
       setSelectedCell({ ...selectedCell, value: newValue });
 
       if (getCompletedValuesFromTable(newTable).length === 9) {
-        changeWon(true);
+        setWon(true);
       }
     }
   }
@@ -155,6 +156,7 @@ const useSudokuBoard = () => {
   return {
     onPressActionCell,
     globalCompletedValues,
+    won,
     onPressCell,
   };
 };
