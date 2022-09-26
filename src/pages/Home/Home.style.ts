@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { colors } from 'src/styles/colors';
 
 const styles = StyleSheet.create({
   container: {
@@ -10,7 +11,7 @@ const styles = StyleSheet.create({
   gameTitle: {
     fontWeight: 'bold',
     fontSize: 40,
-    color: '#382e2e',
+    color: colors.black[800],
     marginBottom: 50,
   },
   selectorContainer: {

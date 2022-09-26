@@ -1,4 +1,5 @@
 import { Dimensions, StyleSheet } from 'react-native';
+import { colors } from 'src/styles/colors';
 
 const styles = StyleSheet.create({
   container: {
@@ -9,10 +10,10 @@ const styles = StyleSheet.create({
   valueOptionText: {
     fontSize: 35,
     fontWeight: 'bold',
-    color: '#384653',
+    color: colors.blue[800],
   },
   valueOptionTextDisabled: {
-    color: '#b2bec9',
+    color: colors.black[100],
   },
 });
 

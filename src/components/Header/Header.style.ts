@@ -3,20 +3,13 @@ import { colors } from 'src/styles/colors';
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
+    backgroundColor: colors.white,
+    height: 55,
     width: '100%',
-    maxHeight: 40,
-  },
-  scrollContent: {
+    elevation: 3,
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  textContainer: {
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 18,
-    color: colors.black[900],
-    fontWeight: 'bold',
+    justifyContent: 'space-between',
   },
 });
 

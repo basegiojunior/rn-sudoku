@@ -43,7 +43,6 @@ export const Selector = <T extends unknown>(props: SelectorProps<T>) => {
         onLayout={event => {
           setTextSize(event.nativeEvent.layout.width);
         }}
-        style={styles.scrollContainer}
         horizontal
         showsHorizontalScrollIndicator={false}
         scrollEnabled={false}

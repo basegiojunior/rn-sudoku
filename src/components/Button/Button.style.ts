@@ -1,12 +1,13 @@
 import { StyleSheet, ViewStyle } from 'react-native';
+import { colors } from 'src/styles/colors';
 import { ButtonVariant } from './Button.types';
 
 export const buttonVariantStyle: Record<ButtonVariant, ViewStyle> = {
   primary: {
-    backgroundColor: '#1040a5',
+    backgroundColor: colors.blue[500],
   },
   secondary: {
-    backgroundColor: '#472783',
+    backgroundColor: colors.purple[400],
   },
 };
 
@@ -25,7 +26,7 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: 'bold',
     fontSize: 16,
-    color: '#ffffff',
+    color: colors.white,
   },
 });
 

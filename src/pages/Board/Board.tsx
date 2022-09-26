@@ -3,6 +3,8 @@ import React from 'react';
 import { View } from 'react-native';
 import ActionButton from 'src/components/ActionButton';
 import Cell from 'src/components/Cell';
+import Header from 'src/components/Header';
+import HeaderButton from 'src/components/HeaderButton';
 import Modal from 'src/components/Modal';
 import { useGameContext } from 'src/contexts/useGameContext';
 import useSudokuBoard, { CELL_VALUES } from 'src/hooks/useSudokuBoard';
@@ -14,7 +16,7 @@ export const Board: React.FC = () => {
   const { onPressActionCell, onPressCell, globalCompletedValues } =
     useSudokuBoard();
   const { table, newGame } = useGameContext();
-  const { navigate } = useNavigation<MainNavigationProps>();
+  const { navigate, goBack } = useNavigation<MainNavigationProps>();
 
   function onPressHome() {
     navigate(RoutesList.Home);
@@ -24,38 +26,53 @@ export const Board: React.FC = () => {
     newGame();
   }
 
+  function onPressGoBack() {
+    goBack();
+  }
+
+  function onPressGiveUp() {}
+
   return (
-    <View style={styles.container}>
-      {table.map((row, rowIndex) => (
-        <View key={`${rowIndex}row`} style={styles.row}>
-          {row.map((cell, colIndex) => (
-            <Cell
-              cell={cell}
-              colIndex={colIndex}
-              rowIndex={rowIndex}
-              onPress={onPressCell}
-              key={`${colIndex}col`}
-              hasError={cell.hasError}
-              isEqualToSelected={cell.isEqualToSelected}
+    <>
+      <Header
+        left={<HeaderButton text="Voltar" onPress={onPressGoBack} />}
+        right={<HeaderButton text="Desistir" onPress={onPressGiveUp} />}
+      />
+      <View style={styles.container}>
+        {table.map((row, rowIndex) => (
+          <View key={`${rowIndex}row`} style={styles.row}>
+            {row.map((cell, colIndex) => (
+              <Cell
+                cell={cell}
+                colIndex={colIndex}
+                rowIndex={rowIndex}
+                onPress={onPressCell}
+                key={`${colIndex}col`}
+                hasError={cell.hasError}
+                isEqualToSelected={cell.isEqualToSelected}
+              />
+            ))}
+          </View>
+        ))}
+
+        <View style={styles.row}>
+          {CELL_VALUES.map(cellValue => (
+            <ActionButton
+              key={cellValue}
+              onPress={() => onPressActionCell(cellValue)}
+              value={cellValue}
+              disabled={globalCompletedValues.includes(cellValue)}
             />
           ))}
         </View>
-      ))}
 
-      <View style={styles.row}>
-        {CELL_VALUES.map(cellValue => (
-          <ActionButton
-            key={cellValue}
-            onPress={() => onPressActionCell(cellValue)}
-            value={cellValue}
-            disabled={globalCompletedValues.includes(cellValue)}
+        <Modal show={globalCompletedValues.length === 9}>
+          <FinishGame
+            onPressHome={onPressHome}
+            onPressNewGame={onPressNewGame}
           />
-        ))}
+        </Modal>
       </View>
-
-      <Modal show={globalCompletedValues.length === 9}>
-        <FinishGame onPressHome={onPressHome} onPressNewGame={onPressNewGame} />
-      </Modal>
-    </View>
+    </>
   );
 };

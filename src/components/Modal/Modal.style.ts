@@ -1,11 +1,12 @@
 import { Dimensions, StyleSheet } from 'react-native';
+import { colors } from 'src/styles/colors';
 
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     width: '100%',
     height: '100%',
-    backgroundColor: 'rgba(0,0,0,.4)',
+    backgroundColor: colors.black.alpha40,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -13,7 +14,7 @@ const styles = StyleSheet.create({
     width: '85%',
     paddingVertical: 24,
     paddingHorizontal: 24,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.white,
     borderRadius: 12,
   },
 });

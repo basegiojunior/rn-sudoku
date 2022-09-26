@@ -1,4 +1,5 @@
 import { Dimensions, StyleSheet } from 'react-native';
+import { colors } from 'src/styles/colors';
 
 const cellSize = Math.floor((Dimensions.get('window').width - 30) / 9);
 
@@ -51,13 +52,14 @@ export const makeBordersCellContainerStyle = (row: number, col: number) => {
   return arrayStyles;
 };
 
-const borderColor = '#cccccc';
-const highlightedBackgroundColor = '#e2e4eb';
+const borderColor = colors.black[200];
+const borderColorDivider = colors.black[600];
+const highlightedBackgroundColor = colors.black[50];
 
 const styles = StyleSheet.create({
   cellText: {
     fontSize: cellSize * 0.7,
-    color: '#2e2e2e',
+    color: colors.black[800],
     fontWeight: 'normal',
   },
   cell: {
@@ -73,35 +75,35 @@ const styles = StyleSheet.create({
     borderLeftColor: borderColor,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.white,
   },
   highlighted: {
     backgroundColor: highlightedBackgroundColor,
   },
   hasErrorCellText: {
-    color: '#a70f0f',
+    color: colors.red[500],
   },
   isEqualToSelectedCellText: {
-    color: '#0f19a7',
+    color: colors.blue[600],
   },
   selectable: {
-    backgroundColor: '#c0cae4',
+    backgroundColor: colors.blue[100],
   },
   withBottomDivider: {
     borderBottomWidth: 2,
-    borderBottomColor: '#646464',
+    borderBottomColor: borderColorDivider,
   },
   withTopDivider: {
     borderTopWidth: 2,
-    borderTopColor: '#646464',
+    borderTopColor: borderColorDivider,
   },
   withRightDivider: {
     borderRightWidth: 2,
-    borderRightColor: '#5a5a5a',
+    borderRightColor: borderColorDivider,
   },
   withLeftDivider: {
     borderLeftWidth: 2,
-    borderLeftColor: '#5a5a5a',
+    borderLeftColor: borderColorDivider,
   },
   withoutTopDivider: {
     borderTopWidth: 0,

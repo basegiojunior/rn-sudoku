@@ -20,7 +20,7 @@ const MainRoutes = () => {
         <Stack.Screen
           name={RoutesList.Board}
           component={Board}
-          options={{ title: '' }}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

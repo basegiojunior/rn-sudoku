@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { colors } from 'src/styles/colors';
 
 const styles = StyleSheet.create({
   newGameButtonContainer: {
@@ -9,7 +10,7 @@ const styles = StyleSheet.create({
     width: 16,
   },
   text: {
-    color: '#252323',
+    color: colors.black[800],
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 35,
