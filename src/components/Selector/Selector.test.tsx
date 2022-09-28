@@ -7,9 +7,7 @@ import { Selector } from './Selector';
 
 describe('Selector', () => {
   test('Should render correctly', () => {
-    const tree = renderer
-      .create(<Selector title="Selector" />)
-      .toJSON();
+    const tree = renderer.create(<Selector title="Selector" />).toJSON();
     expect(tree).toMatchSnapshot();
   });
 });

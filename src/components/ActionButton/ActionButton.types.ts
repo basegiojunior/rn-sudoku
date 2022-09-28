@@ -1,5 +1,5 @@
 export interface ActionButtonProps {
   value: number;
-  onPress: () => void;
+  onPress?: () => void;
   disabled?: boolean;
 }

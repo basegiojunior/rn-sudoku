@@ -11,6 +11,7 @@ export const Button: React.FC<ButtonProps> = props => {
     <Pressable
       onPress={props.onPress}
       android_ripple={{ color: colors.black.alpha30 }}
+      testID="button-pressable"
       style={[
         styles.button,
         fullWidth && styles.buttonFullWidth,

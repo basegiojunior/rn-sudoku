@@ -1,13 +1,26 @@
 import 'react-native';
 
 import React from 'react';
-import renderer from 'react-test-renderer';
 
 import { FinishGame } from './FinishGame';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
 describe('FinishGame', () => {
-  test('Should render correctly', () => {
-    const tree = renderer.create(<FinishGame title="FinishGame" />).toJSON();
-    expect(tree).toMatchSnapshot();
+  test('Should call functions correctly', async () => {
+    const onPressHome = jest.fn();
+    const onPressNewGame = jest.fn();
+
+    render(
+      <FinishGame onPressHome={onPressHome} onPressNewGame={onPressNewGame} />,
+    );
+
+    const newGameButton = await screen.findByText('Novo Jogo');
+    const homeButton = await screen.findByText('Início');
+
+    fireEvent.press(newGameButton);
+    fireEvent.press(homeButton);
+
+    expect(onPressHome).toHaveBeenCalled();
+    expect(onPressNewGame).toHaveBeenCalled();
   });
 });
